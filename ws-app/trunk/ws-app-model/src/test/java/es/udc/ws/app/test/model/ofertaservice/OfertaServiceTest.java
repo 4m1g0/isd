@@ -463,24 +463,21 @@ public class OfertaServiceTest {
 
 		// Add ofertas
 		List<Oferta> ofertas = new LinkedList<Oferta>();
-		Oferta oferta1 = createOferta(getValidOferta("oferta titulo 1"));
+		Oferta oferta1 = createOferta(getValidOferta("oferta patata 1"));
 		ofertas.add(oferta1);
-		Oferta oferta2 = createOferta(getValidOferta("oferta titulo 2"));
+		Oferta oferta2 = createOferta(getValidOferta("oferta patata 2"));
 		ofertas.add(oferta2);
-		Oferta oferta3 = createOferta(getValidOferta("oferta titulo 3"));
+		Oferta oferta3 = createOferta(getValidOferta("oferta patata 3"));
 		ofertas.add(oferta3);
 
 		try {
-			List<Oferta> foundOfertas = ofertaService.findOfertas("oferta");
-		    System.out.println(foundOfertas.get(0).getTitulo());
-		    System.out.println(ofertas.get(0).getTitulo());
+			List<Oferta> foundOfertas = ofertaService.findOfertas("oFerta paTatA");
 
-
-			foundOfertas = ofertaService.findOfertas("Titulo 2");
+			foundOfertas = ofertaService.findOfertas("patata 2");
 			assertEquals(1, foundOfertas.size());
 			assertEquals(ofertas.get(1), foundOfertas.get(0));
 
-			foundOfertas = ofertaService.findOfertas("titulo 5");
+			foundOfertas = ofertaService.findOfertas("patata 5");
 			assertEquals(0, foundOfertas.size());
 		} finally {
 			// Clear Database
