@@ -37,7 +37,6 @@ public class Jdbc3CcSqlOfertaDao extends AbstractSqlOfertaDao {
             preparedStatement.setFloat(i++, oferta.getPrecioRebajado());
             preparedStatement.setShort(i++, oferta.getMaxPersonas());
             preparedStatement.setShort(i++,  oferta.getEstado());
-            preparedStatement.setLong(i++, oferta.getOfertaId());
             
             /* Execute query. */
             preparedStatement.executeUpdate();

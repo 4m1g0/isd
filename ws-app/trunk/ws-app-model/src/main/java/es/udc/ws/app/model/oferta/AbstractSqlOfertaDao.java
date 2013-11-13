@@ -45,14 +45,14 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
             i = 1;
             String titulo = resultSet.getString(i++);
             String descripcion = resultSet.getString(i++);
-            float precioReal = resultSet.getFloat(i++);
-            float precioRebajado = resultSet.getFloat(i++);
             Calendar iniReserva = Calendar.getInstance();
             iniReserva.setTime(resultSet.getTimestamp(i++));
             Calendar limReserva = Calendar.getInstance();
             limReserva.setTime(resultSet.getTimestamp(i++));
             Calendar limOferta = Calendar.getInstance();
             limOferta.setTime(resultSet.getTimestamp(i++));
+            float precioReal = resultSet.getFloat(i++);
+            float precioRebajado = resultSet.getFloat(i++);
             short maxPersonas = resultSet.getShort(i++);
             short estado = resultSet.getShort(i++);
 
@@ -70,7 +70,7 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
 
         /* Create "queryString". */
         String[] words = keywords != null ? keywords.split(" ") : null;
-        String queryString = "SELECT titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado FROM Oferta";
+        String queryString = "SELECT ofertaId, titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado FROM Oferta";
         if (words != null && words.length > 0) {
             queryString += " WHERE";
             for (int i = 0; i < words.length; i++) {
@@ -103,14 +103,14 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
                 Long ofertaId = new Long(resultSet.getLong(i++));
                 String titulo = resultSet.getString(i++);
                 String descripcion = resultSet.getString(i++);
-                float precioReal = resultSet.getFloat(i++);
-                float precioRebajado = resultSet.getFloat(i++);
                 Calendar iniReserva = Calendar.getInstance();
                 iniReserva.setTime(resultSet.getTimestamp(i++));
                 Calendar limReserva = Calendar.getInstance();
                 limReserva.setTime(resultSet.getTimestamp(i++));
                 Calendar limOferta = Calendar.getInstance();
                 limOferta.setTime(resultSet.getTimestamp(i++));
+                float precioReal = resultSet.getFloat(i++);
+                float precioRebajado = resultSet.getFloat(i++);
                 short maxPersonas = resultSet.getShort(i++);
                 short estado = resultSet.getShort(i++);
 

@@ -47,7 +47,7 @@ public class OfertaServiceImpl implements OfertaService {
         PropertyValidator.validateMandatoryString("titulo", oferta.getTitulo());
         PropertyValidator.validateMandatoryString("descripcion", oferta.getDescripcion());
         PropertyValidator.validateDouble("precioReal", oferta.getPrecioReal(), 0, PRECIO_REAL_MAXIMO);
-        PropertyValidator.validateDouble("precioRebajado", oferta.getPrecioReal(), 0, PRECIO_REBAJADO_MAXIMO);
+        PropertyValidator.validateDouble("precioRebajado", oferta.getPrecioRebajado(), 0, PRECIO_REBAJADO_MAXIMO);
         PropertyValidator.validatePastDate("iniReserva", oferta.getIniReserva());
         PropertyValidator.validatePastDate("limReserva", oferta.getLimReserva());
         PropertyValidator.validatePastDate("limOferta", oferta.getLimOferta());
