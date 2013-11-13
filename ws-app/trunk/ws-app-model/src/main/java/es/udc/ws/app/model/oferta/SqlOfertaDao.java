@@ -7,17 +7,17 @@ import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
 public interface SqlOfertaDao {
 
-    public Oferta create(Connection connection, Oferta movie);
+    public Oferta create(Connection connection, Oferta oferta);
 
-    public Oferta find(Connection connection, Long movieId)
+    public Oferta find(Connection connection, Long ofertaId)
             throws InstanceNotFoundException;
 
     public List<Oferta> findByKeywords(Connection connection,
             String keywords);
 
-    public void update(Connection connection, Oferta movie)
+    public void update(Connection connection, Oferta oferta)
             throws InstanceNotFoundException;
 
-    public void remove(Connection connection, Long movieId)
+    public void remove(Connection connection, Long ofertaId)
             throws InstanceNotFoundException;
 }
