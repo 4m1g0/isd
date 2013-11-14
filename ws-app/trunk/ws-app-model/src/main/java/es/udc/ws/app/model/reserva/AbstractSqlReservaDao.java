@@ -44,7 +44,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
             Calendar fechaReserva = Calendar.getInstance();
             fechaReserva.setTime(resultSet.getTimestamp(i++));
 
-            /* Return sale. */
+            /* Return reserva. */
             return new Reserva(reservaId, ofertaId, emailUsuario, numeroTarjeta,
                     estado, fechaReserva);
 
@@ -55,7 +55,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
     }
 
     @Override
-    public void update(Connection connection, Reserva sale)
+    public void update(Connection connection, Reserva reserva)
             throws InstanceNotFoundException {
 
         /* Create "queryString". */
@@ -67,20 +67,20 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
 
             /* Fill "preparedStatement". */
             int i = 1;
-            preparedStatement.setLong(i++, sale.getOfertaId());
-            preparedStatement.setString(i++, sale.getEmailUsuario());
-            preparedStatement.setString(i++, sale.getNumeroTarjeta());
-            preparedStatement.setShort(i++, sale.getEstado());
-            Timestamp date = sale.getFechaReserva() != null ? new Timestamp(
-                    sale.getFechaReserva().getTime().getTime()) : null;
+            preparedStatement.setLong(i++, reserva.getOfertaId());
+            preparedStatement.setString(i++, reserva.getEmailUsuario());
+            preparedStatement.setString(i++, reserva.getNumeroTarjeta());
+            preparedStatement.setShort(i++, reserva.getEstado());
+            Timestamp date = reserva.getFechaReserva() != null ? new Timestamp(
+                    reserva.getFechaReserva().getTime().getTime()) : null;
             preparedStatement.setTimestamp(i++, date);
-            preparedStatement.setLong(i++, sale.getReservaId());
+            preparedStatement.setLong(i++, reserva.getReservaId());
 
             /* Execute query. */
             int updatedRows = preparedStatement.executeUpdate();
 
             if (updatedRows == 0) {
-                throw new InstanceNotFoundException(sale.getOfertaId(),
+                throw new InstanceNotFoundException(reserva.getOfertaId(),
                         Reserva.class.getName());
             }
 

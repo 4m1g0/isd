@@ -7,6 +7,7 @@ import static es.udc.ws.app.model.util.ModelConstants.PRECIO_REBAJADO_MAXIMO;
 import static es.udc.ws.app.model.util.ModelConstants.MAX_PERSONAS;
 import static es.udc.ws.app.model.util.ModelConstants.NUM_ESTADOS;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Connection;
@@ -334,8 +335,8 @@ public class OfertaServiceTest {
 				exceptionCatched = true;
 			}
 			assertTrue(exceptionCatched);
-
-			// Check oferta maxPersonas <= MAX_RUNTIME
+			
+			// Check oferta maxPersonas <= MAX_PERSONAS
 			exceptionCatched = false;
 			oferta = getValidOferta();
 			oferta.setMaxPersonas((short) (MAX_PERSONAS + 1));
@@ -344,29 +345,30 @@ public class OfertaServiceTest {
 			} catch (InputValidationException e) {
 				exceptionCatched = true;
 			}
+			assertTrue(exceptionCatched);
+			
+			// Check oferta Estados
+			exceptionCatched = false;
+			oferta = getValidOferta();
+			oferta.setEstado((short) -1);
+			try {
+				addedOferta = ofertaService.addOferta(oferta);
+			} catch (InputValidationException e) {
+				exceptionCatched = true;
+			}
+			assertTrue(exceptionCatched);
+			
+			
+			// Check oferta Estados <= NUM_ESTADOS
+			exceptionCatched = false;
+			oferta = getValidOferta();
+			oferta.setEstado((short) (NUM_ESTADOS + 1));
+			try {
+				addedOferta = ofertaService.addOferta(oferta);
+			} catch (InputValidationException e) {
+				exceptionCatched = true;
+			}
 			assertTrue(exceptionCatched);		
-		
-		// Check oferta Estados
-		exceptionCatched = false;
-		oferta = getValidOferta();
-		oferta.setEstado((short) -1);
-		try {
-			addedOferta = ofertaService.addOferta(oferta);
-		} catch (InputValidationException e) {
-			exceptionCatched = true;
-		}
-		assertTrue(exceptionCatched);
-		
-		// Check oferta Estados <= NUM_ESTADOS
-		exceptionCatched = false;
-		oferta = getValidOferta();
-		oferta.setEstado((short) (NUM_ESTADOS + 1));
-		try {
-			addedOferta = ofertaService.addOferta(oferta);
-		} catch (InputValidationException e) {
-			exceptionCatched = true;
-		}
-		assertTrue(exceptionCatched);		
 		} 
 		
 		finally {
@@ -384,6 +386,19 @@ public class OfertaServiceTest {
 
 	}
 
+	@Test
+	public void testAddNullMaxPersonasOferta() throws InputValidationException, InstanceNotFoundException {
+		
+		Oferta oferta = createOferta(getValidOferta());
+		oferta.setMaxPersonas(null);
+		ofertaService.updateOferta(oferta);
+		Oferta foundOferta = ofertaService.findOferta(oferta.getOfertaId());
+		assertEquals(oferta, foundOferta);
+
+		// Clear Database
+		removeOferta(oferta.getOfertaId());
+	}
+	
 	@Test
 	public void testUpdateOferta() throws InputValidationException,
 			InstanceNotFoundException {

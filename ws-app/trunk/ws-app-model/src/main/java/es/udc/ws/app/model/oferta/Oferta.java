@@ -14,6 +14,9 @@ public class Oferta {
     private float precioRebajado;
     private Short maxPersonas;
     private Short estado; // FIXME
+    private final Short s0; // Creada - La oferta ha sido creada pero aún no ha sido reservada por nadie.
+    private final Short s1; // Comprometida - La oferta ha sido reservada por algún usuario, pero aún no ha sido reclamada por todos ellos.
+    private final Short s2 ; // Liberada - La oferta ha sido reclamada por todos los usuarios que la reservaron hasta el momento.
 
     public Oferta(String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas, short estado) 
     {
@@ -35,8 +38,11 @@ public class Oferta {
         this.precioRebajado = precioRebajado;
         this.maxPersonas = maxPersonas;
         this.estado = estado;
+        this.s0 = 0;
+        this.s1 = 1;
+        this.s2 = 2;
     }
-
+    
 	public Oferta(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas, short estado) 
     {
         this(titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado);
@@ -121,7 +127,10 @@ public class Oferta {
 	}
 
 	public void setMaxPersonas(Short maxPersonas) {
-		this.maxPersonas = maxPersonas;
+        if (maxPersonas == null)
+            this.maxPersonas = Short.MAX_VALUE;
+        else
+        	this.maxPersonas = maxPersonas;
 	}
 
 	public Short getEstado() {
@@ -206,7 +215,11 @@ public class Oferta {
         if (Float.floatToIntBits(precioRebajado) != Float.floatToIntBits(other.precioRebajado)) {
             return false;
         }
-        if (maxPersonas != other.maxPersonas) {
+        if (maxPersonas == null) {
+            if (other.maxPersonas != null) {
+                return false;
+            }
+        } else if (!maxPersonas.equals(other.maxPersonas)) {
             return false;
         }
         if (estado != other.estado) {

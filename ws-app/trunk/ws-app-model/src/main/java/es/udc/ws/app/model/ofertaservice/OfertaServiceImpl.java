@@ -51,7 +51,8 @@ public class OfertaServiceImpl implements OfertaService {
         PropertyValidator.validatePastDate("iniReserva", oferta.getIniReserva());
         PropertyValidator.validatePastDate("limReserva", oferta.getLimReserva());
         PropertyValidator.validatePastDate("limOferta", oferta.getLimOferta());
-        PropertyValidator.validateLong("maxPersonas", oferta.getMaxPersonas(), 0, MAX_PERSONAS);
+        if (oferta.getMaxPersonas() != Short.MAX_VALUE) // maxPersonas = null sin limite
+        	PropertyValidator.validateLong("maxPersonas", oferta.getMaxPersonas(), 0, MAX_PERSONAS);
         PropertyValidator.validateLong("estado", oferta.getEstado(), 0, NUM_ESTADOS);
     }
 

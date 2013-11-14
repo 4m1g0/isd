@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 public class Jdbc3CcSqlReservaDao extends AbstractSqlReservaDao {
 
     @Override
-    public Reserva create(Connection connection, Reserva sale) {
+    public Reserva create(Connection connection, Reserva reserva) {
 
         /* Create "queryString". */
         String queryString = "INSERT INTO Reserva"
@@ -22,11 +22,11 @@ public class Jdbc3CcSqlReservaDao extends AbstractSqlReservaDao {
 
             /* Fill "preparedStatement". */
             int i = 1;
-            preparedStatement.setLong(i++, sale.getOfertaId());
-            preparedStatement.setString(i++, sale.getEmailUsuario());
-            preparedStatement.setString(i++, sale.getNumeroTarjeta());
-            preparedStatement.setShort(i++, sale.getEstado());
-            Timestamp fechaReserva = new Timestamp(sale.getFechaReserva().getTime()
+            preparedStatement.setLong(i++, reserva.getOfertaId());
+            preparedStatement.setString(i++, reserva.getEmailUsuario());
+            preparedStatement.setString(i++, reserva.getNumeroTarjeta());
+            preparedStatement.setShort(i++, reserva.getEstado());
+            Timestamp fechaReserva = new Timestamp(reserva.getFechaReserva().getTime()
                     .getTime());
             preparedStatement.setTimestamp(i++, fechaReserva);
 
@@ -42,9 +42,9 @@ public class Jdbc3CcSqlReservaDao extends AbstractSqlReservaDao {
             }
             Long reservaId = resultSet.getLong(1);
 
-            /* Return sale. */
-            return new Reserva(reservaId, sale.getOfertaId(), sale.getEmailUsuario(),
-                    sale.getNumeroTarjeta(), sale.getEstado(), sale.getFechaReserva());
+            /* Return reserva. */
+            return new Reserva(reservaId, reserva.getOfertaId(), reserva.getEmailUsuario(),
+                    reserva.getNumeroTarjeta(), reserva.getEstado(), reserva.getFechaReserva());
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

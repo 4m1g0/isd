@@ -28,7 +28,7 @@ CREATE TABLE Oferta ( ofertaId BIGINT NOT NULL AUTO_INCREMENT,
     limOferta TIMESTAMP DEFAULT 0 NOT NULL,
     precioReal FLOAT NOT NULL,
     precioRebajado FLOAT NOT NULL,
-    maxPersonas SMALLINT NOT NULL,
+    maxPersonas SMALLINT,
     CONSTRAINT OfertaPK PRIMARY KEY(ofertaId), 
     CONSTRAINT validState CHECK ( estado >= 0 AND estado <= 2) ) ENGINE = InnoDB;
 
@@ -38,7 +38,6 @@ CREATE INDEX OfertaIndexByTitle ON Oferta (titulo);
 -- --------------------------------- Reserva ------------------------------------
 
 CREATE TABLE Reserva ( reservaId BIGINT NOT NULL AUTO_INCREMENT,
-    reservaId BIGINT NOT NULL,
     ofertaId BIGINT NOT NULL,
     emailUsuario VARCHAR(40) COLLATE latin1_bin NOT NULL,
     numeroTarjeta VARCHAR(16),
