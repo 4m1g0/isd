@@ -474,7 +474,7 @@ public class OfertaServiceTest {
 			exceptionCatched = true;
 		}
 		assertTrue(exceptionCatched);
-		/* No se puede probar esto aun por que no de puede eliminar de la db
+		/*No se puede probar esto aun por que no de puede eliminar de la db
 		oferta.setEstado(Oferta.ESTADO_COMPROMETIDA);
 		oferta = ofertaService.addOferta(oferta);
 		
@@ -505,6 +505,10 @@ public class OfertaServiceTest {
 		ofertas.add(oferta2);
 		Oferta oferta3 = getValidOferta("oferta patata 3");
 		oferta3.setDescripcion("prueba de fuego");
+		oferta3.setEstado(Oferta.ESTADO_LIBERADA);
+		Calendar date = Calendar.getInstance();
+		date.set(1990, 11, 1);
+		oferta3.setIniReserva(date);
 		oferta3 = ofertaService.addOferta(oferta3);
 		ofertas.add(oferta3);
 
@@ -527,6 +531,19 @@ public class OfertaServiceTest {
 			foundOfertas = ofertaService.findOfertas("fuEgo");
 			assertEquals(1, foundOfertas.size());
 			assertEquals(ofertas.get(2), foundOfertas.get(0));
+			
+			Calendar date1 = Calendar.getInstance();
+			date1.set(1990, 11, 7);
+			foundOfertas = ofertaService.findOfertas(date1);
+			assertEquals(1, foundOfertas.size());
+			assertEquals(ofertas.get(2), foundOfertas.get(0));
+			
+			date1.set(1990, 10, 7);
+			foundOfertas = ofertaService.findOfertas(date1);
+			assertEquals(0, foundOfertas.size());
+			
+			foundOfertas = ofertaService.findOfertas("fuego", Oferta.ESTADO_LIBERADA);
+			assertEquals(1, foundOfertas.size());
 		} finally {
 			// Clear Database
 			for (Oferta oferta : ofertas) {

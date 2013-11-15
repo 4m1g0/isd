@@ -69,11 +69,13 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
     @Override
     public List<Oferta> findByKeywords(Connection connection, String keywords, Short estadoRequerido, Calendar fecha) {
 
+    	boolean and = false;
         /* Create "queryString". */
         String[] words = keywords != null ? keywords.split(" ") : null;
         String queryString = "SELECT ofertaId, titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado FROM Oferta";
         if (words != null && words.length > 0) {
             queryString += " WHERE";
+            and = true;
             for (int i = 0; i < words.length; i++) {
                 if (i > 0) {
                     queryString += " AND";
@@ -82,15 +84,24 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
             }
         }
         if (estadoRequerido != null) {
-        	queryString += " AND estado = ?";
+        	if (and)
+        		queryString += " AND estado = ?";
+        	else {
+        		queryString += " WHERE estado = ?";
+        		and = true;
+        	}	
         }
         if (fecha != null) {
-        	queryString += " AND ? BETWEEN iniReserva AND limReserva";
+        	if (and)
+        		queryString += " AND ? BETWEEN iniReserva AND limReserva";
+        	else{
+        		queryString += " WHERE ? BETWEEN iniReserva AND limReserva";
+        	}	
         }
         queryString += " ORDER BY titulo";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)) {
-        	int i = 1;
+        	int i = 0;
             if (words != null) {
                 /* Fill "preparedStatement". */
                 for (i = 0; i < words.length; i++) {
@@ -98,10 +109,10 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
                 }
             }
             if (estadoRequerido != null) {
-            	preparedStatement.setShort(i++, estadoRequerido);
+            	preparedStatement.setShort(++i, estadoRequerido);
             }
             if (fecha != null) {
-            	preparedStatement.setTimestamp(i++, new Timestamp(fecha.getTime().getTime()));
+            	preparedStatement.setTimestamp(++i, new Timestamp(fecha.getTime().getTime()));
             }
 
             /* Execute query. */

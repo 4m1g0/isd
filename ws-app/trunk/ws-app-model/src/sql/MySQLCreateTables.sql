@@ -44,7 +44,7 @@ CREATE TABLE Reserva ( reservaId BIGINT NOT NULL AUTO_INCREMENT,
     estado SMALLINT NOT NULL,
     fechaReserva TIMESTAMP DEFAULT 0 NOT NULL,
     CONSTRAINT ReservaPK PRIMARY KEY(ReservaId),
-    CONSTRAINT validState CHECK ( estado >= 0 AND estado <= 2),
+    CONSTRAINT validState CHECK ( estado >= 0 AND estado <= 1),
     CONSTRAINT ReservaOfertaIdFK FOREIGN KEY(ofertaId)
         REFERENCES Oferta(ofertaId) ON DELETE CASCADE ) ENGINE = InnoDB;
 

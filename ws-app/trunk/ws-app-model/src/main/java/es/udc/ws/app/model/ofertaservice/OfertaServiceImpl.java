@@ -221,7 +221,7 @@ public class OfertaServiceImpl implements OfertaService {
 		if (param1 instanceof Short) {
 			return findOfertas(null, (Short) param1, null);
 		}
-		if (param1 instanceof String) {
+		if (param1 instanceof Calendar) {
 			return findOfertas(null, null, (Calendar) param1);
 		}
 		return null;
