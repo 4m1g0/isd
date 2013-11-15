@@ -93,10 +93,14 @@ public class OfertaServiceImpl implements OfertaService {
     }
 
     @Override
-    public void updateOferta(Oferta oferta) throws InputValidationException,
-            InstanceNotFoundException {
+    public void updateOferta(Oferta oferta) throws InputValidationException, InstanceNotFoundException {
 
         validateOferta(oferta);
+        
+        Oferta old = findOferta(oferta.getOfertaId());
+        if (old.getEstado() != Oferta.ESTADO_CREADA) {
+        	throw new InputValidationException("La oferta no esta en estado Creada");
+        }
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -131,7 +135,12 @@ public class OfertaServiceImpl implements OfertaService {
     }
 
     @Override
-    public void removeOferta(Long ofertaId) throws InstanceNotFoundException {
+    public void removeOferta(Long ofertaId) throws InstanceNotFoundException, InputValidationException {
+    	
+    	Oferta old = findOferta(ofertaId);
+        if (old.getEstado() != Oferta.ESTADO_CREADA && old.getEstado() != Oferta.ESTADO_LIBERADA) {
+        	throw new InputValidationException("La oferta no esta en estado Creada ni liberada");
+        }
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -176,15 +185,47 @@ public class OfertaServiceImpl implements OfertaService {
 
     }
 
-    @Override
-    public List<Oferta> findOfertas(String keywords) {
+	@Override
+	public List<Oferta> findOfertas() {
+		return findOfertas(null, null, null);
+	}
 
-        try (Connection connection = dataSource.getConnection()) {
-            return ofertaDao.findByKeywords(connection, keywords);
+	@Override
+	public List<Oferta> findOfertas(String keywords, Short estado, Calendar fecha) {
+		try (Connection connection = dataSource.getConnection()) {
+				return ofertaDao.findByKeywords(connection, keywords, estado, fecha);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
+	}
+
+	@Override
+	public List<Oferta> findOfertas(Object param1, Object param2) {
+		if (param1 instanceof String) {
+			if (param2 instanceof Short)
+				return findOfertas((String) param1, (Short) param2, null);
+			if (param2 instanceof Calendar)
+				return findOfertas((String) param1, null, (Calendar) param2);
+		}
+		if (param1 instanceof Short) {
+			return findOfertas(null, (Short) param1, (Calendar) param2);
+		}
+		return null;
+	}
+
+	@Override
+	public List<Oferta> findOfertas(Object param1) {
+		if (param1 instanceof String) {
+			return findOfertas((String) param1, null, null);
+		}
+		if (param1 instanceof Short) {
+			return findOfertas(null, (Short) param1, null);
+		}
+		if (param1 instanceof String) {
+			return findOfertas(null, null, (Calendar) param1);
+		}
+		return null;
+	}
 
     /*@Override
     public Reserva buyOferta(Long ofertaId, String userId, String creditCardNumber)

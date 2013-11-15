@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -66,7 +67,7 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
     }
 
     @Override
-    public List<Oferta> findByKeywords(Connection connection, String keywords) {
+    public List<Oferta> findByKeywords(Connection connection, String keywords, Short estadoRequerido, Calendar fecha) {
 
         /* Create "queryString". */
         String[] words = keywords != null ? keywords.split(" ") : null;
@@ -77,18 +78,30 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
                 if (i > 0) {
                     queryString += " AND";
                 }
-                queryString += " LOWER(titulo) LIKE LOWER(?)";
+                queryString += " LOWER(CONCAT(descripcion, titulo)) LIKE LOWER(?)";
             }
+        }
+        if (estadoRequerido != null) {
+        	queryString += " AND estado = ?";
+        }
+        if (fecha != null) {
+        	queryString += " AND ? BETWEEN iniReserva AND limReserva";
         }
         queryString += " ORDER BY titulo";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)) {
-
+        	int i = 1;
             if (words != null) {
                 /* Fill "preparedStatement". */
-                for (int i = 0; i < words.length; i++) {
+                for (i = 0; i < words.length; i++) {
                     preparedStatement.setString(i + 1, "%" + words[i] + "%");
                 }
+            }
+            if (estadoRequerido != null) {
+            	preparedStatement.setShort(i++, estadoRequerido);
+            }
+            if (fecha != null) {
+            	preparedStatement.setTimestamp(i++, new Timestamp(fecha.getTime().getTime()));
             }
 
             /* Execute query. */
@@ -99,7 +112,7 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
 
             while (resultSet.next()) {
 
-                int i = 1;
+                i = 1;
                 Long ofertaId = new Long(resultSet.getLong(i++));
                 String titulo = resultSet.getString(i++);
                 String descripcion = resultSet.getString(i++);

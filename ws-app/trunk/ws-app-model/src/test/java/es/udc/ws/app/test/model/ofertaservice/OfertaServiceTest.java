@@ -84,7 +84,7 @@ public class OfertaServiceTest {
 
 	}
 
-	private void removeOferta(Long ofertaId) {
+	private void removeOferta(Long ofertaId) throws InputValidationException {
 
 		try {
 			ofertaService.removeOferta(ofertaId);
@@ -186,7 +186,7 @@ public class OfertaServiceTest {
 	}
 
 	@Test
-	public void testAddInvalidOferta() {
+	public void testAddInvalidOferta() throws InputValidationException {
 
 		Oferta oferta = getValidOferta();
 		Oferta addedOferta = null;
@@ -410,11 +410,21 @@ public class OfertaServiceTest {
 			oferta.setMaxPersonas((short) 5);
 			oferta.setDescripcion("new description");
 			oferta.setPrecioReal(20);
+			oferta.setEstado(Oferta.ESTADO_LIBERADA);
 
 			ofertaService.updateOferta(oferta);
 
 			Oferta updatedOferta = ofertaService.findOferta(oferta.getOfertaId());
 			assertEquals(oferta, updatedOferta);
+			
+			boolean exceptionCatched = false;
+			try {
+				// actualizar oferta con estado != creada
+				ofertaService.updateOferta(oferta);
+			} catch (InputValidationException e) {
+				exceptionCatched = true;
+			}
+			assertTrue(exceptionCatched);
 
 		} finally {
 			// Clear Database
@@ -450,31 +460,42 @@ public class OfertaServiceTest {
 
 	}
 
-	@Test(expected = InstanceNotFoundException.class)
-	public void testRemoveOferta() throws InstanceNotFoundException {
+	@Test
+	public void testRemoveOferta() throws InstanceNotFoundException, InputValidationException {
 
 		Oferta oferta = createOferta(getValidOferta());
 		boolean exceptionCatched = false;
+		
+		ofertaService.removeOferta(oferta.getOfertaId());
+
 		try {
-			ofertaService.removeOferta(oferta.getOfertaId());
+			ofertaService.findOferta(oferta.getOfertaId());
 		} catch (InstanceNotFoundException e) {
 			exceptionCatched = true;
 		}
-		assertTrue(!exceptionCatched);
-
-		ofertaService.findOferta(oferta.getOfertaId());
-
+		assertTrue(exceptionCatched);
+		/* No se puede probar esto aun por que no de puede eliminar de la db
+		oferta.setEstado(Oferta.ESTADO_COMPROMETIDA);
+		oferta = ofertaService.addOferta(oferta);
+		
+		exceptionCatched = false;
+		try {
+			ofertaService.removeOferta(oferta.getOfertaId());
+		} catch (InputValidationException e) {
+			exceptionCatched = true;
+		}
+		assertTrue(exceptionCatched);*/
 	}
 
 	@Test(expected = InstanceNotFoundException.class)
-	public void testRemoveNonExistentOferta() throws InstanceNotFoundException {
+	public void testRemoveNonExistentOferta() throws InstanceNotFoundException, InputValidationException {
 
 		ofertaService.removeOferta(NON_EXISTENT_OFERTA_ID);
 
 	}
 
 	@Test
-	public void testFindOfertas() {
+	public void testFindOfertas() throws InputValidationException {
 
 		// Add ofertas
 		List<Oferta> ofertas = new LinkedList<Oferta>();
@@ -482,18 +503,30 @@ public class OfertaServiceTest {
 		ofertas.add(oferta1);
 		Oferta oferta2 = createOferta(getValidOferta("oferta patata 2"));
 		ofertas.add(oferta2);
-		Oferta oferta3 = createOferta(getValidOferta("oferta patata 3"));
+		Oferta oferta3 = getValidOferta("oferta patata 3");
+		oferta3.setDescripcion("prueba de fuego");
+		oferta3 = ofertaService.addOferta(oferta3);
 		ofertas.add(oferta3);
 
 		try {
-			List<Oferta> foundOfertas = ofertaService.findOfertas("oFerta paTatA");
-
-			foundOfertas = ofertaService.findOfertas("patata 2");
+			List<Oferta> foundOfertas = ofertaService.findOfertas("patAta");
+			assertEquals(3, foundOfertas.size());
+			assertEquals(ofertas, foundOfertas);
+			
+			foundOfertas = ofertaService.findOfertas();
+			assertEquals(3, foundOfertas.size());
+			assertEquals(ofertas, foundOfertas);
+			
+			foundOfertas = ofertaService.findOfertas("patAta 2");
 			assertEquals(1, foundOfertas.size());
 			assertEquals(ofertas.get(1), foundOfertas.get(0));
 
 			foundOfertas = ofertaService.findOfertas("patata 5");
 			assertEquals(0, foundOfertas.size());
+			
+			foundOfertas = ofertaService.findOfertas("fuEgo");
+			assertEquals(1, foundOfertas.size());
+			assertEquals(ofertas.get(2), foundOfertas.get(0));
 		} finally {
 			// Clear Database
 			for (Oferta oferta : ofertas) {

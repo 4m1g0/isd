@@ -13,11 +13,11 @@ public class Oferta {
     private float precioReal;
     private float precioRebajado;
     private Short maxPersonas;
-    private Short estado; // FIXME
-    private final Short s0; // Creada - La oferta ha sido creada pero aún no ha sido reservada por nadie.
-    private final Short s1; // Comprometida - La oferta ha sido reservada por algún usuario, pero aún no ha sido reclamada por todos ellos.
-    private final Short s2 ; // Liberada - La oferta ha sido reclamada por todos los usuarios que la reservaron hasta el momento.
-
+    private Short estado;
+    public final static short ESTADO_CREADA = 0;
+	public final static short ESTADO_COMPROMETIDA = 1;
+	public final static short ESTADO_LIBERADA = 2;
+    
     public Oferta(String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas, short estado) 
     {
         this.titulo = titulo;
@@ -38,9 +38,6 @@ public class Oferta {
         this.precioRebajado = precioRebajado;
         this.maxPersonas = maxPersonas;
         this.estado = estado;
-        this.s0 = 0;
-        this.s1 = 1;
-        this.s2 = 2;
     }
     
 	public Oferta(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas, short estado) 
