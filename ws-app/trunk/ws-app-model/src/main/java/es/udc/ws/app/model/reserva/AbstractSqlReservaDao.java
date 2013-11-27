@@ -5,8 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
+import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
 public abstract class AbstractSqlReservaDao implements SqlReservaDao {
@@ -40,7 +43,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
             Long ofertaId = resultSet.getLong(i++);
             String emailUsuario = resultSet.getString(i++);
             String numeroTarjeta = resultSet.getString(i++);
-            Short estado = resultSet.getShort(i++);
+            short estado = resultSet.getShort(i++);
             Calendar fechaReserva = Calendar.getInstance();
             fechaReserva.setTime(resultSet.getTimestamp(i++));
 
@@ -54,12 +57,56 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
 
     }
 
+	@Override
+	public List<Reserva> findReservas(Connection connection, Long ofertaId, Short estado)
+			throws InstanceNotFoundException {
+		
+        /* Create "queryString". */
+        String queryString = "SELECT reservaId, emailUsuario, numeroTarjeta, estado, fechaReserva FROM Reserva WHERE ofertaId = ?";		
+		if (estado != null)
+			queryString += " AND estado = ?";
+			
+        try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)) {
+
+            /* Fill "preparedStatement". */
+            int i = 1;
+            preparedStatement.setLong(i++, ofertaId.longValue());
+            if (estado != null)
+                preparedStatement.setShort(i++, estado);
+
+            /* Execute query. */
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<Reserva> reservas = new ArrayList<Reserva>();
+
+            /* Get results. */
+            while (resultSet.next()) {
+	            i = 1;
+	            Long reservaId = resultSet.getLong(i++);
+	            String emailUsuario = resultSet.getString(i++);
+	            String numeroTarjeta = resultSet.getString(i++);
+	            short _estado = resultSet.getShort(i++);
+	            Calendar fechaReserva = Calendar.getInstance();
+	            fechaReserva.setTime(resultSet.getTimestamp(i++));
+	
+	            reservas.add(new Reserva(reservaId, ofertaId, emailUsuario, numeroTarjeta, _estado, fechaReserva));
+            }
+            
+            /* Return reserva. */
+            return reservas;
+            		
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }        
+             
+	}
+	
     @Override
     public void update(Connection connection, Reserva reserva)
             throws InstanceNotFoundException {
 
         /* Create "queryString". */
-        String queryString = "UPDATE Sale"
+        String queryString = "UPDATE Reserva"
                 + " SET ofertaId = ?, emailUsuario = ?, numeroTarjeta = ?, "
                 + " estado = ?, fechaReserva = ? WHERE reservaId = ?";
 

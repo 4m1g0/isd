@@ -3,7 +3,9 @@ package es.udc.ws.app.model.ofertaservice;
 import java.util.Calendar;
 import java.util.List;
 
+import es.udc.ws.app.exceptions.ReservaExpirationException;
 import es.udc.ws.app.model.oferta.Oferta;
+import es.udc.ws.app.model.reserva.Reserva;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
@@ -26,9 +28,13 @@ public interface OfertaService {
     
     public List<Oferta> findOfertas();
 
-    /*public Sale buyMovie(Long movieId, String userId, String creditCardNumber)
+    public Long reservarOferta(Long ofertaId, String emailUsuario, String numeroTarjeta)
             throws InstanceNotFoundException, InputValidationException;
 
-    public Sale findSale(Long saleId) throws InstanceNotFoundException,
-            SaleExpirationException;*/
+    public List<Reserva> findReservas(Long ofertaId, Short estado) throws InstanceNotFoundException;
+
+    public Reserva findReserva(Long reservaId) throws InstanceNotFoundException;//,ReservaExpirationException;
+    
+    //reclamarOferta: Si devuelve false ==> la reserva está cerrada. Si devuelve true ==> la reserva está abierta.
+    public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException;
 }

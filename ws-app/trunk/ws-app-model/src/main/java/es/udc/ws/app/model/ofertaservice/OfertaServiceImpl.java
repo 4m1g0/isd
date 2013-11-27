@@ -1,11 +1,12 @@
 package es.udc.ws.app.model.ofertaservice;
 
 import static es.udc.ws.app.model.util.ModelConstants.BASE_URL;
+import static es.udc.ws.app.model.util.ModelConstants.MAX_PERSONAS;
+import static es.udc.ws.app.model.util.ModelConstants.NUM_ESTADOS;
 import static es.udc.ws.app.model.util.ModelConstants.OFERTA_DATA_SOURCE;
 import static es.udc.ws.app.model.util.ModelConstants.PRECIO_REAL_MAXIMO;
 import static es.udc.ws.app.model.util.ModelConstants.PRECIO_REBAJADO_MAXIMO;
-import static es.udc.ws.app.model.util.ModelConstants.MAX_PERSONAS;
-import static es.udc.ws.app.model.util.ModelConstants.NUM_ESTADOS;
+import static es.udc.ws.app.model.util.ModelConstants.RESERVA_EXPIRATION_DAYS;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import es.udc.ws.app.exceptions.ReservaExpirationException;
 import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.app.model.oferta.SqlOfertaDao;
 import es.udc.ws.app.model.oferta.SqlOfertaDaoFactory;
@@ -227,34 +229,149 @@ public class OfertaServiceImpl implements OfertaService {
 		return null;
 	}
 
-    /*@Override
-    public Reserva buyOferta(Long ofertaId, String userId, String creditCardNumber)
+    @Override
+    public Long reservarOferta(Long ofertaId, String emailUsuario, String numeroTarjeta)
             throws InstanceNotFoundException, InputValidationException {
 
-        PropertyValidator.validateCreditCard(creditCardNumber);
+    	// VALIDATE emailUsuario ?
+        PropertyValidator.validateCreditCard(numeroTarjeta);
+        
+    	Oferta old = findOferta(ofertaId);
+    	Calendar now = Calendar.getInstance();
+    	Long reservaId = null;
+    	
+    	if (old.getMaxPersonas()==MAX_PERSONAS) 
+        	throw new InputValidationException("Maximo de personas para esta oferta.");
+    	old.setMaxPersonas((short) (old.getMaxPersonas() + 1));
+		/*if (((old.getIniReserva().before(now) && old.getLimReserva().after(now))) 
+				|| old.getIniReserva().equals(now) || old.getLimReserva().equals(now)) {*/
+    	// FIXME
+    	/*if (event.get(Calendar.YEAR) >= now.get(Calendar.YEAR)
+    		    && event.get(Calendar.MONTH) >= now.get(Calendar.MONTH)
+    		    && event.get(Calendar.DAY_OF_MONTH) >= now.get(Calendar.DAY_OF_MONTH)
+	    	    (Calendar.HOUR);
+	    	    (Calendar.HOUR_OF_DAY);
+	    	    (Calendar.MINUTE);
+	    	    (Calendar.SECOND);
+	    	    (Calendar.MILLISECOND);*/
+	    	    
+	        if (old.getEstado() == Oferta.ESTADO_CREADA || old.getEstado() == Oferta.ESTADO_LIBERADA) 
+	        	old.setEstado(Oferta.ESTADO_COMPROMETIDA);
+	        	        
+	        try (Connection connection = dataSource.getConnection()) {
+	
+	            try {
+	
+	                /* Prepare connection. */
+	                connection
+	                        .setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+	                connection.setAutoCommit(false);
+	
+	                /* Do work. */
+	                ofertaDao.update(connection, old);
+	                reservaId = reservaDao.create(connection, new Reserva(ofertaId, emailUsuario,
+	                        numeroTarjeta, Reserva.ESTADO_PENDIENTE, Calendar.getInstance()));
+	
+	                /* Commit. */
+	                connection.commit();
+		
+	            } catch (SQLException e) {
+	                connection.rollback();
+	                throw new RuntimeException(e);
+	            } catch (RuntimeException | Error e) {
+	                connection.rollback();
+	                throw e;
+	            }
+	
+	        } catch (SQLException e) {
+	            throw new RuntimeException(e);
+	        }
+		//}
+		return reservaId;
+    }
 
+	@Override
+	public List<Reserva> findReservas(Long ofertaId, Short estado)
+			throws InstanceNotFoundException {
+        try (Connection connection = dataSource.getConnection()) {
+
+            List<Reserva> reservas = reservaDao.findReservas(connection, ofertaId, estado);
+            /*Calendar now = Calendar.getInstance();
+            for (int i = 0; i < reservas.size(); i++) {
+            	if (reservas.get(i).getFechaReserva().after(now))
+            		reservas.remove(i);
+            }*/
+            
+            return reservas;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }	}
+	
+    @Override
+    public Reserva findReserva(Long reservaId) 
+    		throws InstanceNotFoundException {//, ReservaExpirationException {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            Reserva reserva = reservaDao.find(connection, reservaId);
+            /*Calendar now = Calendar.getInstance();
+            if (reserva.getFechaReserva().after(now)) {
+                return reserva;
+            } else {
+                throw new ReservaExpirationException(reservaId,
+                        reserva.getFechaReserva());
+            }*/
+            
+            return reserva;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+/*
+    private static String getOfertaUrl(Long ofertaId) {
+        return BASE_URL + ofertaId + "/" + UUID.randomUUID().toString();
+    }*/
+
+
+
+	@Override
+	public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException {
+		
+		Reserva reserva = findReserva(reservaId);
+		
+		if (reserva.getEstado() == Reserva.ESTADO_CERRADA)
+			return false;
+		
+		Oferta oferta = findOferta(reserva.getOfertaId());
+		
         try (Connection connection = dataSource.getConnection()) {
 
             try {
 
-                /* Prepare connection. *//* FIXME
+                /* Prepare connection. */
                 connection
                         .setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
                 connection.setAutoCommit(false);
 
-                /* Do work. *//* FIXME
-                Oferta oferta = ofertaDao.find(connection, ofertaId);
-                Calendar expirationDate = Calendar.getInstance();
-                expirationDate.add(Calendar.DAY_OF_MONTH, SALE_EXPIRATION_DAYS);
-                Reserva reserva = reservaDao.create(connection, new Reserva(ofertaId, userId,
-                        expirationDate, creditCardNumber, oferta.getPrice(),
-                        getOfertaUrl(ofertaId), Calendar.getInstance()));
-
-                /* Commit. *//* FIXME
+                /* Do work. */
+        		reserva.setEstado(Reserva.ESTADO_CERRADA);
+        		reservaDao.update(connection, reserva);
+        		
+        		// Si todas las reservas se han disfrutado ==> Estado de la oferta liberada!
+        		if (findReservas(oferta.getOfertaId(), 
+        				Reserva.ESTADO_PENDIENTE).size() == 1) //1 porque aun no hicimos commit del estado de esta reserva
+        			oferta.setEstado(Oferta.ESTADO_LIBERADA);
+        		
+        		ofertaDao.update(connection, oferta);
+        		
+                /* Commit. */
                 connection.commit();
-
-                return reserva;
-
+        		
+        		return true;
+        		
             } catch (InstanceNotFoundException e) {
                 connection.commit();
                 throw e;
@@ -269,31 +386,7 @@ public class OfertaServiceImpl implements OfertaService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-    }
-
-    @Override
-    public Reserva findReserva(Long reservaId) throws InstanceNotFoundException,
-            ReservaExpirationException {
-
-        try (Connection connection = dataSource.getConnection()) {
-
-            Reserva reserva = reservaDao.find(connection, reservaId);
-            Calendar now = Calendar.getInstance();
-            if (reserva.getExpirationDate().after(now)) {
-                return reserva;
-            } else {
-                throw new ReservaExpirationException(reservaId,
-                        reserva.getExpirationDate());
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    private static String getOfertaUrl(Long ofertaId) {
-        return BASE_URL + ofertaId + "/" + UUID.randomUUID().toString();
-    }*/
+		
+	}
+	
 }

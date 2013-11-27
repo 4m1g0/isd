@@ -7,10 +7,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 
+import es.udc.ws.util.exceptions.InstanceNotFoundException;
+
 public class Jdbc3CcSqlReservaDao extends AbstractSqlReservaDao {
 
     @Override
-    public Reserva create(Connection connection, Reserva reserva) {
+    public Long create(Connection connection, Reserva reserva) {
 
         /* Create "queryString". */
         String queryString = "INSERT INTO Reserva"
@@ -40,11 +42,12 @@ public class Jdbc3CcSqlReservaDao extends AbstractSqlReservaDao {
                 throw new SQLException(
                         "JDBC driver did not return generated key.");
             }
-            Long reservaId = resultSet.getLong(1);
+            
+        return resultSet.getLong(1);
 
-            /* Return reserva. */
+            /* Return reserva. *//*
             return new Reserva(reservaId, reserva.getOfertaId(), reserva.getEmailUsuario(),
-                    reserva.getNumeroTarjeta(), reserva.getEstado(), reserva.getFechaReserva());
+                    reserva.getNumeroTarjeta(), reserva.getEstado(), reserva.getFechaReserva());*/
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -8,7 +8,9 @@ public class Reserva {
     private Long ofertaId;
     private String emailUsuario;
     private String numeroTarjeta;
-    private Short estado; // FIXME
+    private Short estado;
+    public final static short ESTADO_PENDIENTE = 0;
+    public final static short ESTADO_CERRADA = 1;
     private Calendar fechaReserva;
     
 
@@ -94,6 +96,7 @@ public class Reserva {
         result = prime * result
                 + ((emailUsuario == null) ? 0 : emailUsuario.hashCode());
         result = prime * result + ((reservaId == null) ? 0 : reservaId.hashCode());
+        result = prime * result + estado;
         return result;
     }
 
@@ -137,6 +140,14 @@ public class Reserva {
         } else if (!emailUsuario.equals(other.emailUsuario)) {
             return false;
         }
+        if (estado == null) {
+            if (other.estado != null) {
+                return false;
+            }
+        } else if (!estado.equals(other.estado)) {
+            return false;
+        }        
+
         if (reservaId == null) {
             if (other.reservaId != null) {
                 return false;
