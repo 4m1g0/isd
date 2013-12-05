@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 
-import es.udc.ws.util.exceptions.InstanceNotFoundException;
-
 public class Jdbc3CcSqlReservaDao extends AbstractSqlReservaDao {
 
     @Override

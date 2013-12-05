@@ -12,7 +12,6 @@ public class Reserva {
     public final static short ESTADO_PENDIENTE = 0;
     public final static short ESTADO_CERRADA = 1;
     private Calendar fechaReserva;
-    
 
     public Reserva(Long ofertaId, String emailUsuario, String numeroTarjeta, Short estado, Calendar fechaReserva) 
     {
@@ -26,7 +25,8 @@ public class Reserva {
         }
     }
 
-    public Reserva(Long reservaId, Long ofertaId, String emailUsuario, String numeroTarjeta, Short estado, Calendar fechaReserva) {
+    public Reserva(Long reservaId, Long ofertaId, String emailUsuario,
+    		String numeroTarjeta, Short estado, Calendar fechaReserva) {
         this(ofertaId, emailUsuario, numeroTarjeta, estado, fechaReserva);
         this.reservaId = reservaId;
     }
@@ -82,7 +82,6 @@ public class Reserva {
 		this.estado = estado;
 	}
 
-	
 	@Override
     public int hashCode() {
         final int prime = 31;
@@ -119,6 +118,7 @@ public class Reserva {
         } else if (!numeroTarjeta.equals(other.numeroTarjeta)) {
             return false;
         }
+
         if (fechaReserva == null) {
             if (other.fechaReserva != null) {
                 return false;

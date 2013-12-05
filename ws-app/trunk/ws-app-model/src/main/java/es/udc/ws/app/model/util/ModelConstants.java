@@ -9,7 +9,6 @@ public final class ModelConstants {
     public static final float MAX_PRICE = 1000;*/
 	
 	public static final String OFERTA_DATA_SOURCE = "ws-javaexamples-ds";
-    public static final String BASE_URL = "http://ws-ofertas.udc.es/reserva/stream/";
     public static final int PRECIO_REAL_MAXIMO = 3000;
     public static final int PRECIO_REBAJADO_MAXIMO = 2500;
     public static final int MAX_PERSONAS = 10;

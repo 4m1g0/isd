@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
 public abstract class AbstractSqlReservaDao implements SqlReservaDao {
@@ -88,7 +87,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
 	            short _estado = resultSet.getShort(i++);
 	            Calendar fechaReserva = Calendar.getInstance();
 	            fechaReserva.setTime(resultSet.getTimestamp(i++));
-	
+
 	            reservas.add(new Reserva(reservaId, ofertaId, emailUsuario, numeroTarjeta, _estado, fechaReserva));
             }
             
