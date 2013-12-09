@@ -4,7 +4,11 @@ import es.udc.ws.app.client.service.ClientOfertaService;
 import es.udc.ws.app.client.service.soap.wsdl.*;
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
-import es.udc.ws.app.exceptions.ReservaExpirationException;
+import es.udc.ws.app.exceptions.OfertaEmailException;
+import es.udc.ws.app.exceptions.OfertaEstadoException;
+import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
+import es.udc.ws.app.exceptions.OfertaReclamaDateException;
+import es.udc.ws.app.exceptions.OfertaReservaDateException;
 import es.udc.ws.util.configuration.ConfigurationParametersManager;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
@@ -51,7 +55,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
 
     @Override
     public void updateOferta(OfertaDto oferta)
-            throws InputValidationException, InstanceNotFoundException {
+            throws InputValidationException, InstanceNotFoundException, OfertaEstadoException {
         try {
             ofertasProvider.updateOferta(OfertaDtoToSoapOfertaDtoConversor
                     .toSoapOfertaDto(oferta));
@@ -61,32 +65,58 @@ public class SoapClientOfertaService implements ClientOfertaService {
             throw new InstanceNotFoundException(
                     ex.getFaultInfo().getInstanceId(),
                     ex.getFaultInfo().getInstanceType());
-        } catch(Exception ex) {
+        } 
+        catch (SoapOfertaEstadoException ex) {
+            throw new OfertaEstadoException(ex.getFaultInfo().getOfertaId(),
+                    ex.getFaultInfo().getEstado());
+        }
+        catch(Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
     @Override
     public void removeOferta(Long ofertaId)
-            throws InstanceNotFoundException {
+            throws InstanceNotFoundException, InputValidationException, OfertaEstadoException {
         try {
             ofertasProvider.removeOferta(ofertaId);
-        } catch (SoapInstanceNotFoundException ex) {
+        }
+        catch (SoapInputValidationException ex) {
+            throw new InputValidationException(ex.getMessage());
+        }
+        catch (SoapInstanceNotFoundException ex) {
             throw new InstanceNotFoundException(
                     ex.getFaultInfo().getInstanceId(),
                     ex.getFaultInfo().getInstanceType());
         }
+        catch (SoapOfertaEstadoException ex) {
+            throw new OfertaEstadoException(ex.getFaultInfo().getOfertaId(),
+                    ex.getFaultInfo().getEstado());
+        }
     }
+
+	@Override
+	public OfertaDto findOferta(Long ofertaId) throws InstanceNotFoundException {
+		try {
+			return OfertaDtoToSoapOfertaDtoConversor.toOfertaDto(
+					ofertasProvider.findOferta(ofertaId));
+		}
+        catch (SoapInstanceNotFoundException ex) {
+            throw new InstanceNotFoundException(
+                    ex.getFaultInfo().getInstanceId(),
+                    ex.getFaultInfo().getInstanceType());
+        }
+	}
 
     @Override
     public List<OfertaDto> findOfertas(String keywords, Short estado, Calendar fecha) {
         return OfertaDtoToSoapOfertaDtoConversor.toOfertaDtos(
-                    ofertasProvider.findOfertas(keywords, estado, fecha));
+                    ofertasProvider.findOfertas(keywords, null, Calendar.getInstance()));
     }
 
     @Override
     public Long reservarOferta(Long ofertaId, String emailUsuario, String numeroTarjeta)
-            throws InstanceNotFoundException, InputValidationException {
+            throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException {
         try {
             return ofertasProvider.reservarOferta(ofertaId, emailUsuario, numeroTarjeta);
         } catch (SoapInputValidationException ex) {
@@ -95,53 +125,65 @@ public class SoapClientOfertaService implements ClientOfertaService {
             throw new InstanceNotFoundException(
                     ex.getFaultInfo().getInstanceId(),
                     ex.getFaultInfo().getInstanceType());
-        } catch(Exception ex) {
-            throw new RuntimeException(ex);
         }
-    }
-
-    @Override
-    public String getOfertaUrl(Long reservaId)
-            throws InstanceNotFoundException, ReservaExpirationException {
-        try {
-            return ofertasProvider.findReserva(reservaId).getOfertaUrl();
-        } catch (SoapInstanceNotFoundException ex) {
-            throw new InstanceNotFoundException(
-                    ex.getFaultInfo().getInstanceId(),
-                    ex.getFaultInfo().getInstanceType());
-        } catch (SoapReservaExpirationException ex) {
-            throw new ReservaExpirationException(ex.getFaultInfo().getReservaId(),
-                    ex.getFaultInfo().getExpirationDate()
-                    .toGregorianCalendar());
+        catch (SoapOfertaMaxPersonasException ex) {
+            throw new OfertaMaxPersonasException(ex.getFaultInfo().getOfertaId(),
+                    ex.getFaultInfo().getMaxPersonas());
+        }
+        catch (SoapOfertaEmailException ex) {
+            throw new OfertaEmailException(ex.getFaultInfo().getOfertaId(),
+                    ex.getFaultInfo().getEmailUsuario());
+        }
+        catch (SoapOfertaReservaDateException ex) {
+            throw new OfertaReservaDateException(ex.getFaultInfo().getOfertaId());
+        }
+        catch(Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 
 	@Override
 	public List<ReservaDto> findReservas(Long ofertaId, Short estado)
 			throws InstanceNotFoundException {
-        return OfertaDtoToSoapOfertaDtoConversor.toOfertaDtos(
-                ofertasProvider.findReservas(ofertaId, estado));
+		try {
+	        return OfertaDtoToSoapOfertaDtoConversor.toOfertaDtos(
+	                ofertasProvider.findReservas(ofertaId, estado));
+		}
+        catch (SoapInstanceNotFoundException ex) {
+            throw new InstanceNotFoundException(
+                    ex.getFaultInfo().getInstanceId(),
+                    ex.getFaultInfo().getInstanceType());
+        }
 	}
 	
 	@Override
 	public ReservaDto findReserva(Long reservaId)
 			throws InstanceNotFoundException {
-		return OfertaDtoToSoapOfertaDtoConversor.toOfertaDto(
-				ofertasProvider.findReserva(reservaId));
+		try {
+			return OfertaDtoToSoapOfertaDtoConversor.toOfertaDto(
+					ofertasProvider.findReserva(reservaId));
+		}
+        catch (SoapInstanceNotFoundException ex) {
+            throw new InstanceNotFoundException(
+                    ex.getFaultInfo().getInstanceId(),
+                    ex.getFaultInfo().getInstanceType());
+        }
 	}
 
 	@Override
 	public boolean reclamarOferta(Long reservaId)
-			throws InstanceNotFoundException {
+			throws InstanceNotFoundException, OfertaReclamaDateException {
         try {
             return ofertasProvider.reclamarOferta(reservaId);
-        } catch (SoapInputValidationException ex) {
-            throw new InputValidationException(ex.getMessage());
         } catch (SoapInstanceNotFoundException ex) {
             throw new InstanceNotFoundException(
                     ex.getFaultInfo().getInstanceId(),
                     ex.getFaultInfo().getInstanceType());
-        } catch(Exception ex) {
+        }
+        catch (SoapOfertaReclamaDateException ex) {
+            throw new OfertaReservaDateException(ex.getFaultInfo().getOfertaId());
+        }
+        catch(Exception ex) {
             throw new RuntimeException(ex);
         }
 	}
@@ -155,5 +197,4 @@ public class SoapClientOfertaService implements ClientOfertaService {
 
         return endpointAddress;
     }
-
 }

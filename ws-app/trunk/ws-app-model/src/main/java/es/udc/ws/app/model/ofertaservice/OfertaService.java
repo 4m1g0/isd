@@ -33,7 +33,7 @@ public interface OfertaService {
 
     public List<Reserva> findReservas(Long ofertaId, Short estado) throws InstanceNotFoundException;
 
-    public Reserva findReserva(Long reservaId) throws InstanceNotFoundException;//,ReservaExpirationException;
+    public Reserva findReserva(Long reservaId) throws InstanceNotFoundException;
     
     //reclamarOferta: Si devuelve false ==> la reserva está cerrada. Si devuelve true ==> la reserva está abierta.
     public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException;

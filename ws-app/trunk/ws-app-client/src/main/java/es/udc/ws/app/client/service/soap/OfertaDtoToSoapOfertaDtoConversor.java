@@ -24,8 +24,9 @@ public class OfertaDtoToSoapOfertaDtoConversor {
     
     public static OfertaDto toOfertaDto(
             es.udc.ws.app.client.service.soap.wsdl.OfertaDto oferta) {
-        return new OfertaDto(oferta.getOfertaId(), oferta.getTitulo(), 
-                oferta.getMaxPersonas(), oferta.getDescripcion(), oferta.getPrecioReal());
+        return new OfertaDto(oferta.getOfertaId(), oferta.getTitulo(), oferta.getDescripcion(), oferta.getIniReserva(), 
+        		oferta.getLimReserva(), oferta.getLimOferta(), oferta.getPrecioReal(), oferta.getPrecioRebajado(),
+                oferta.getMaxPersonas());
     }     
     
     public static List<OfertaDto> toOfertaDtos(

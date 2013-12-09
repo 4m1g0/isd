@@ -47,7 +47,7 @@ public class SoapOfertaService {
         operationName="updateOferta"
     )
     public void updateOferta(@WebParam(name="ofertaDto") OfertaDto ofertaDto)
-            throws SoapInputValidationException, SoapInstanceNotFoundException, OfertaEstadoException {
+            throws SoapInputValidationException, SoapInstanceNotFoundException, OfertaEstadoException, SoapOfertaEstadoException {
         Oferta oferta = OfertaToOfertaDtoConversor.toOferta(ofertaDto);
         try {
             OfertaServiceFactory.getService().updateOferta(oferta);
@@ -58,19 +58,29 @@ public class SoapOfertaService {
                     new SoapInstanceNotFoundExceptionInfo(ex.getInstanceId(),
                         ex.getInstanceType()));
         }
+         catch (OfertaEstadoException ex) {
+             throw new SoapOfertaEstadoException(
+                     new SoapOfertaEstadoExceptionInfo(ex.getOfertaId(),
+                         ex.getEstado()));
+         }
     }
 
     @WebMethod(
         operationName="removeOferta"
     )
     public void removeOferta(@WebParam(name="ofertaId") Long ofertaId)
-            throws SoapInstanceNotFoundException, InputValidationException, OfertaEstadoException {
+            throws SoapInstanceNotFoundException, InputValidationException, OfertaEstadoException, SoapOfertaEstadoException {
         try {
             OfertaServiceFactory.getService().removeOferta(ofertaId);
         } catch (InstanceNotFoundException ex) {
             throw new SoapInstanceNotFoundException(
                     new SoapInstanceNotFoundExceptionInfo(
                     ex.getInstanceId(), ex.getInstanceType()));
+        }
+        catch (OfertaEstadoException ex) {
+            throw new SoapOfertaEstadoException(
+                    new SoapOfertaEstadoExceptionInfo(ex.getOfertaId(),
+                        ex.getEstado()));
         }
     }
 
@@ -108,7 +118,7 @@ public class SoapOfertaService {
     public Long reservarOferta(@WebParam(name="ofertaId")  Long ofertaId,
                          @WebParam(name="emailUsuario")   String emailUsuario,
                          @WebParam(name="numeroTarjeta") String numeroTarjeta)
-            throws SoapInstanceNotFoundException, SoapInputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException {
+            throws SoapInstanceNotFoundException, SoapInputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, SoapOfertaMaxPersonasException, SoapOfertaEmailException, SoapOfertaReservaDateException {
         try {
             Reserva reserva = OfertaServiceFactory.getService().findReserva(OfertaServiceFactory.getService()
                     .reservarOferta(ofertaId, emailUsuario, numeroTarjeta));
@@ -119,6 +129,20 @@ public class SoapOfertaService {
                         ex.getInstanceType()));
         } catch (InputValidationException ex) {
             throw new SoapInputValidationException(ex.getMessage());
+        }
+        catch (OfertaMaxPersonasException ex) {
+            throw new SoapOfertaMaxPersonasException(
+                    new SoapOfertaMaxPersonasExceptionInfo(ex.getOfertaId(),
+                        ex.getMaxPersonas()));
+        }
+        catch (OfertaEmailException ex) {
+            throw new SoapOfertaEmailException(
+                    new SoapOfertaEmailExceptionInfo(ex.getOfertaId(),
+                        ex.getEmailUsuario()));
+        }
+        catch (OfertaReservaDateException ex) {
+            throw new SoapOfertaReservaDateException(
+                    new SoapOfertaReservaDateExceptionInfo(ex.getOfertaId()));
         }
     }
 
@@ -137,8 +161,7 @@ public class SoapOfertaService {
         operationName="findReserva"
     )
     public ReservaDto findReserva(@WebParam(name="reservaId") Long reservaId)
-            throws SoapInstanceNotFoundException,
-            SoapReservaExpirationException {
+            throws SoapInstanceNotFoundException{
 
         try {
             Reserva reserva = OfertaServiceFactory.getService().findReserva(reservaId);
@@ -147,18 +170,14 @@ public class SoapOfertaService {
             throw new SoapInstanceNotFoundException(
                     new SoapInstanceNotFoundExceptionInfo(ex.getInstanceId(),
                         ex.getInstanceType()));
-        } /*catch (ReservaExpirationException ex) {
-            throw new SoapReservaExpirationException(
-                    new SoapReservaExpirationExceptionInfo(ex.getReservaId(),
-                        ex.getExpirationDate()));
-        }*/
+        }
     }
 
     @WebMethod(
             operationName="reclamarOferta"
         )
         public boolean reclamarOferta(@WebParam(name="reservaId")  Long reservaId)
-                throws SoapInstanceNotFoundException, SoapInputValidationException, OfertaReclamaDateException {
+                throws SoapInstanceNotFoundException, SoapInputValidationException, OfertaReclamaDateException, SoapOfertaReclamaDateException {
             try {
             	
                 return OfertaServiceFactory.getService().reclamarOferta(reservaId);
@@ -167,6 +186,10 @@ public class SoapOfertaService {
                 throw new SoapInstanceNotFoundException(
                         new SoapInstanceNotFoundExceptionInfo(ex.getInstanceId(),
                             ex.getInstanceType()));
+            }
+            catch (OfertaReclamaDateException ex) {
+                throw new SoapOfertaReclamaDateException(
+                        new SoapOfertaReclamaDateExceptionInfo(ex.getOfertaId()));
             }
         }
     

@@ -20,8 +20,7 @@
         <dependency>
             <groupId>es.udc.ws.app</groupId>
             <artifactId>ws-app-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+            </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

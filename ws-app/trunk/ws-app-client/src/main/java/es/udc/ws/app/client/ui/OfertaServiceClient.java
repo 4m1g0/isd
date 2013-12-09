@@ -8,11 +8,17 @@ import es.udc.ws.app.client.service.ClientOfertaService;
 import es.udc.ws.app.client.service.ClientOfertaServiceFactory;
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
+import es.udc.ws.app.exceptions.OfertaEmailException;
+import es.udc.ws.app.exceptions.OfertaEstadoException;
+import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
+import es.udc.ws.app.exceptions.OfertaReclamaDateException;
+import es.udc.ws.app.exceptions.OfertaReservaDateException;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
 public class OfertaServiceClient {
 
+	//Método auxiliar
 	private static Calendar DateToCalendar(Date date){ 
 		  Calendar cal = Calendar.getInstance();
 		  cal.setTime(date);
@@ -55,7 +61,7 @@ public class OfertaServiceClient {
                 System.out.println("Oferta with id " + args[1] +
                         " removed sucessfully");
 
-            } catch (NumberFormatException | InstanceNotFoundException ex) {
+            } catch (NumberFormatException | OfertaEstadoException | InstanceNotFoundException ex) {
                 ex.printStackTrace(System.err);
             } catch (Exception ex) {
                 ex.printStackTrace(System.err);
@@ -75,14 +81,14 @@ public class OfertaServiceClient {
                 System.out.println("Oferta " + args[1] + " updated sucessfully");
 
             } catch (NumberFormatException | InputValidationException |
-                     InstanceNotFoundException ex) {
+                     InstanceNotFoundException | OfertaEstadoException ex) {
                 ex.printStackTrace(System.err);
             } catch (Exception ex) {
                 ex.printStackTrace(System.err);
             }
 
         } else if("-fo".equalsIgnoreCase(args[0])) {
-            validateArgs(args, 4, new int[] {2, 3});
+            validateArgs(args, 2, new int[] {1});
 
             // [findOferta] OfertaServiceClient -fo <ofertaId>
 
@@ -105,14 +111,26 @@ public class OfertaServiceClient {
             }
 
         } else if("-fos".equalsIgnoreCase(args[0])) {
-            validateArgs(args, 4, new int[] {2, 3});
 
-            // [findOfertas] OfertaServiceClient -f [keywords] [estado] [fecha]
+            // [findOfertas] OfertaServiceClient -fos [keywords]
 
+        	List<OfertaDto> ofertas = null;
+        	
             try {
-                List<OfertaDto> ofertas = clientOfertaService.findOfertas(args[1], Short.valueOf(args[2]), DateToCalendar(Date.valueOf(args[3]))); //FIXME
-                System.out.println("Found " + ofertas.size() +
-                        " oferta(s) with keywords '" + args[1] + "'");
+            	
+            	if (args[1] != null) {
+            		validateArgs(args, 2, new int[] {});
+            		
+	                ofertas = clientOfertaService.findOfertas(args[1], null, Calendar.getInstance());
+	                System.out.println("Found " + ofertas.size() +
+	                        " oferta(s) with keywords '" + args[1] + "'");
+            	}
+            	
+            	else {
+            		validateArgs(args, 1, new int[] {});
+            		ofertas = clientOfertaService.findOfertas(null, null, Calendar.getInstance());
+            	}
+            	
                 for (int i = 0; i < ofertas.size(); i++) {
                     OfertaDto ofertaDto = ofertas.get(i);
                     System.out.println("Id: " + ofertaDto.getOfertaId() +
@@ -145,8 +163,8 @@ public class OfertaServiceClient {
                         " reservada sucessfully with reserva number " +
                         reservaId);
 
-            } catch (NumberFormatException | InstanceNotFoundException |
-                     InputValidationException ex) {
+            } catch (NumberFormatException | InstanceNotFoundException | OfertaMaxPersonasException | 
+                     OfertaEmailException | OfertaReservaDateException | InputValidationException ex) {
                 ex.printStackTrace(System.err);
             } catch (Exception ex) {
                 ex.printStackTrace(System.err);
@@ -168,7 +186,7 @@ public class OfertaServiceClient {
                 ex.printStackTrace(System.err);
             }
         } else if("-frs".equalsIgnoreCase(args[0])) {
-            validateArgs(args, 2, new int[] {1, 2});
+            validateArgs(args, 3, new int[] {1, 2});
 
             // [find] OfertaServiceClient -frs <ofertaId> <estado>
 
@@ -197,7 +215,11 @@ public class OfertaServiceClient {
                 else
                 	System.out.println("Oferta " + args[1] + " reclamada sucessfully!");
 
-            } catch (Exception ex) {
+            } 
+            catch (OfertaReclamaDateException ex) {
+                ex.printStackTrace(System.err);
+            }
+            catch (Exception ex) {
                 ex.printStackTrace(System.err);
             }
         }
@@ -229,7 +251,7 @@ public class OfertaServiceClient {
                 "  [remove]         OfertaServiceClient -r <ofertaId>\n" +
                 "  [update]         OfertaServiceClient -u <ofertaId> <titulo> <descripcion> <iniReserva> <limReserva> <limOferta> <precioReal> <precioRebajado> <maxPersonas>\n" +
                 "  [findOferta]     OfertaServiceClient -fo <ofertaId>\n" +  
-                "  [findOfertas]    OfertaServiceClient -fos [keywords] [estado] [fecha]\n" +
+                "  [findOfertas]    OfertaServiceClient -fos keywords]\n" +
                 "  [reservar]       OfertaServiceClient -re <ofertaId> <email> <numeroTarjeta>\n" +
                 "  [findReserva]    OfertaServiceClient -fr <reservaId>\n" +
                 "  [findReservas]   OfertaServiceClient -frs <ofertaId> <estado>\n" +
