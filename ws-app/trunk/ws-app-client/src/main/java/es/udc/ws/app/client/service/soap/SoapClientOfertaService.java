@@ -146,7 +146,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
 	public List<ReservaDto> findReservas(Long ofertaId, Short estado)
 			throws InstanceNotFoundException {
 		try {
-	        return OfertaDtoToSoapOfertaDtoConversor.toOfertaDtos(
+	        return ReservaDtoToSoapReservaDtoConversor.toReservaDtos(
 	                ofertasProvider.findReservas(ofertaId, estado));
 		}
         catch (SoapInstanceNotFoundException ex) {
@@ -160,7 +160,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
 	public ReservaDto findReserva(Long reservaId)
 			throws InstanceNotFoundException {
 		try {
-			return OfertaDtoToSoapOfertaDtoConversor.toOfertaDto(
+			return ReservaDtoToSoapReservaDtoConversor.toReservaDto(
 					ofertasProvider.findReserva(reservaId));
 		}
         catch (SoapInstanceNotFoundException ex) {

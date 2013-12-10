@@ -2,7 +2,11 @@ package es.udc.ws.app.client.service.soap;
 
 import es.udc.ws.app.dto.OfertaDto;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 public class OfertaDtoToSoapOfertaDtoConversor {
     
@@ -13,9 +17,25 @@ public class OfertaDtoToSoapOfertaDtoConversor {
         soapOfertaDto.setOfertaId(oferta.getOfertaId());
         soapOfertaDto.setTitulo(oferta.getTitulo());
         soapOfertaDto.setDescripcion(oferta.getDescripcion());
-        soapOfertaDto.setIniReserva(oferta.getIniReserva());
-        soapOfertaDto.setLimReserva(oferta.getLimReserva());
-        soapOfertaDto.setLimOferta(oferta.getLimOferta());
+        
+        GregorianCalendar c1 = new GregorianCalendar();
+        c1.setTime(oferta.getIniReserva().getTime());
+        
+        GregorianCalendar c2 = new GregorianCalendar();
+        c2.setTime(oferta.getLimReserva().getTime());     
+
+        GregorianCalendar c3 = new GregorianCalendar();
+        c3.setTime(oferta.getLimOferta().getTime());
+        
+        try {
+			soapOfertaDto.setIniReserva(DatatypeFactory.newInstance().newXMLGregorianCalendar(c1));
+	        soapOfertaDto.setIniReserva(DatatypeFactory.newInstance().newXMLGregorianCalendar(c2));
+	        soapOfertaDto.setIniReserva(DatatypeFactory.newInstance().newXMLGregorianCalendar(c3));
+		} catch (DatatypeConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
         soapOfertaDto.setPrecioReal(oferta.getPrecioReal());
         soapOfertaDto.setPrecioReal(oferta.getPrecioRebajado());
         soapOfertaDto.setMaxPersonas(oferta.getMaxPersonas());
