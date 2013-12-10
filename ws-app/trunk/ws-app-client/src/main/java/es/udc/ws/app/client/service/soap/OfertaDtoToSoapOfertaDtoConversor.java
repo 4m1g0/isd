@@ -1,12 +1,14 @@
 package es.udc.ws.app.client.service.soap;
 
-import es.udc.ws.app.dto.OfertaDto;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+
+import es.udc.ws.app.dto.OfertaDto;
+import es.udc.ws.app.dto.ReservaDto;
 
 public class OfertaDtoToSoapOfertaDtoConversor {
     
@@ -44,8 +46,10 @@ public class OfertaDtoToSoapOfertaDtoConversor {
     
     public static OfertaDto toOfertaDto(
             es.udc.ws.app.client.service.soap.wsdl.OfertaDto oferta) {
-        return new OfertaDto(oferta.getOfertaId(), oferta.getTitulo(), oferta.getDescripcion(), oferta.getIniReserva(), 
-        		oferta.getLimReserva(), oferta.getLimOferta(), oferta.getPrecioReal(), oferta.getPrecioRebajado(),
+    	
+
+        return new OfertaDto(oferta.getOfertaId(), oferta.getTitulo(), oferta.getDescripcion(), oferta.getIniReserva().toGregorianCalendar(), 
+        		oferta.getLimReserva().toGregorianCalendar(), oferta.getLimOferta().toGregorianCalendar(), oferta.getPrecioReal(), oferta.getPrecioRebajado(),
                 oferta.getMaxPersonas());
     }     
     
@@ -59,6 +63,23 @@ public class OfertaDtoToSoapOfertaDtoConversor {
             
         }
         return ofertaDtos;
-    }    
+    } 
+    
+    public static ReservaDto toReservaDto(
+            es.udc.ws.app.client.service.soap.wsdl.ReservaDto reserva) {
+        return new ReservaDto(reserva.getReservaId(), reserva.getOfertaId(), reserva.getEstado(), reserva.getFechaReserva().toGregorianCalendar());
+    }  
+    
+    public static List<ReservaDto> toReservaDtos(
+            List<es.udc.ws.app.client.service.soap.wsdl.ReservaDto> reservas) {
+        List<ReservaDto> reservaDtos = new ArrayList<>(reservas.size());
+        for (int i = 0; i < reservas.size(); i++) {
+            es.udc.ws.app.client.service.soap.wsdl.ReservaDto reserva = 
+                    reservas.get(i);
+            reservaDtos.add(toReservaDto(reserva));
+            
+        }
+        return reservaDtos;
+    }
     
 }

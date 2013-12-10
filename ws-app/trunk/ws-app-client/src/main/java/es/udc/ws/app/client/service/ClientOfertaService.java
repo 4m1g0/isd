@@ -25,7 +25,7 @@ public interface ClientOfertaService {
     
     public OfertaDto findOferta(Long ofertaId) throws InstanceNotFoundException;
 
-    public List<OfertaDto> findOfertas(String keywords, Short estado, Calendar fecha);
+    public List<OfertaDto> findOfertas(String keywords, Calendar fecha);
 
     //public List<OfertaDto> findOfertas();
     
@@ -37,7 +37,7 @@ public interface ClientOfertaService {
     public ReservaDto findReserva(Long reservaId) throws InstanceNotFoundException;
 
     //reclamarOferta: Si devuelve false ==> la reserva está cerrada. Si devuelve true ==> la reserva está abierta.
-    public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException;
+    public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException, OfertaReservaDateException;
     
 
 }

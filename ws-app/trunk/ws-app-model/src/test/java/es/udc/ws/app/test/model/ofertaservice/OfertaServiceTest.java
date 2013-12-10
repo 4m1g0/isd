@@ -43,6 +43,7 @@ public class OfertaServiceTest {
 	private final long NON_EXISTENT_OFERTA_ID = -1;
 	private final long NON_EXISTENT_RESERVA_ID = -1;
 	private final String USER_EMAIL = "mail@gmail.es";
+	private final String INVALID_USER_EMAIL = "asdfghjk";
 
 	private final String VALID_CREDIT_CARD_NUMBER = "1234567890123456";
 	private final String INVALID_CREDIT_CARD_NUMBER = "";
@@ -546,7 +547,7 @@ public class OfertaServiceTest {
 		
 		try {
 			
-			/* Buy oferta. */
+			/* Reservar oferta. */
 			Calendar beforeIniReserva = Calendar.getInstance();
 			beforeIniReserva.add(Calendar.DAY_OF_MONTH,
 					RESERVA_EXPIRATION_DAYS);
@@ -599,7 +600,7 @@ public class OfertaServiceTest {
 				oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER)));
 			
 			reservas.add(1, ofertaService.findReserva(ofertaService.reservarOferta(
-					oferta.getOfertaId(), USER_EMAIL+"1", VALID_CREDIT_CARD_NUMBER)));
+					oferta.getOfertaId(), "1"+USER_EMAIL, VALID_CREDIT_CARD_NUMBER)));
 			
 			_reservas = ofertaService.findReservas(oferta.getOfertaId(), null);
 			
@@ -608,7 +609,7 @@ public class OfertaServiceTest {
 			
 			/* Añadir y buscar reserva en estado cerrada */			
 			reservas.add(2, ofertaService.findReserva(ofertaService.reservarOferta(
-					oferta.getOfertaId(), USER_EMAIL+"2", VALID_CREDIT_CARD_NUMBER)));
+					oferta.getOfertaId(), "2"+USER_EMAIL, VALID_CREDIT_CARD_NUMBER)));
 			ofertaService.reclamarOferta(reservas.get(2).getReservaId());
 			
 			_reservas = ofertaService.findReservas(oferta.getOfertaId(), Reserva.ESTADO_CERRADA);
@@ -626,7 +627,24 @@ public class OfertaServiceTest {
 	}
 	
 	@Test(expected = InputValidationException.class)
-	public void testBuyOfertaWithInvalidCreditCard() throws 
+	public void testReservarOfertaWithInvalidUserMail() throws 
+		InputValidationException, InstanceNotFoundException, OfertaEstadoException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException {
+
+		Oferta oferta = createOferta(getValidOferta());
+		try {
+			Reserva reserva = ofertaService.findReserva(ofertaService.reservarOferta(
+					oferta.getOfertaId(), INVALID_USER_EMAIL, VALID_CREDIT_CARD_NUMBER));
+			
+			/* Clear database. */
+			removeReserva(reserva.getReservaId());
+		} finally {
+			removeOferta(oferta.getOfertaId());
+		}
+
+	}
+	
+	@Test(expected = InputValidationException.class)
+	public void testReservarOfertaWithInvalidCreditCard() throws 
 		InputValidationException, InstanceNotFoundException, OfertaEstadoException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException {
 
 		Oferta oferta = createOferta(getValidOferta());
@@ -643,7 +661,7 @@ public class OfertaServiceTest {
 	}
 
 	@Test(expected = InstanceNotFoundException.class)
-	public void testBuyNonExistentOferta() throws InputValidationException,
+	public void testReservarNonExistentOferta() throws InputValidationException,
 			InstanceNotFoundException {
 
 		Reserva reserva = ofertaService.findReserva(NON_EXISTENT_RESERVA_ID);

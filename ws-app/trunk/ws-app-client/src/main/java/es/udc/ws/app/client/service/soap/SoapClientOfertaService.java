@@ -1,7 +1,22 @@
 package es.udc.ws.app.client.service.soap;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.ws.BindingProvider;
+
 import es.udc.ws.app.client.service.ClientOfertaService;
-import es.udc.ws.app.client.service.soap.wsdl.*;
+import es.udc.ws.app.client.service.soap.wsdl.OfertasProvider;
+import es.udc.ws.app.client.service.soap.wsdl.OfertasProviderService;
+import es.udc.ws.app.client.service.soap.wsdl.SoapInputValidationException;
+import es.udc.ws.app.client.service.soap.wsdl.SoapInstanceNotFoundException;
+import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaEmailException;
+import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaEstadoException;
+import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaMaxPersonasException;
+import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaReclamaDateException;
+import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaReservaDateException;
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
 import es.udc.ws.app.exceptions.OfertaEmailException;
@@ -12,10 +27,6 @@ import es.udc.ws.app.exceptions.OfertaReservaDateException;
 import es.udc.ws.util.configuration.ConfigurationParametersManager;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
-
-import java.util.Calendar;
-import java.util.List;
-import javax.xml.ws.BindingProvider;
 
 public class SoapClientOfertaService implements ClientOfertaService {
 
@@ -109,9 +120,14 @@ public class SoapClientOfertaService implements ClientOfertaService {
 	}
 
     @Override
-    public List<OfertaDto> findOfertas(String keywords, Short estado, Calendar fecha) {
-        return OfertaDtoToSoapOfertaDtoConversor.toOfertaDtos(
-                    ofertasProvider.findOfertas(keywords, null, Calendar.getInstance()));
+    public List<OfertaDto> findOfertas(String keywords, Calendar fecha) {
+        GregorianCalendar c1 = new GregorianCalendar();
+        try {
+			return OfertaDtoToSoapOfertaDtoConversor.toOfertaDtos(
+			            ofertasProvider.findOfertas(keywords, DatatypeFactory.newInstance().newXMLGregorianCalendar(c1)));
+		} catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
@@ -146,7 +162,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
 	public List<ReservaDto> findReservas(Long ofertaId, Short estado)
 			throws InstanceNotFoundException {
 		try {
-	        return ReservaDtoToSoapReservaDtoConversor.toReservaDtos(
+	        return OfertaDtoToSoapOfertaDtoConversor.toReservaDtos(
 	                ofertasProvider.findReservas(ofertaId, estado));
 		}
         catch (SoapInstanceNotFoundException ex) {
@@ -160,7 +176,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
 	public ReservaDto findReserva(Long reservaId)
 			throws InstanceNotFoundException {
 		try {
-			return ReservaDtoToSoapReservaDtoConversor.toReservaDto(
+			return OfertaDtoToSoapOfertaDtoConversor.toReservaDto(
 					ofertasProvider.findReserva(reservaId));
 		}
         catch (SoapInstanceNotFoundException ex) {
@@ -172,7 +188,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
 
 	@Override
 	public boolean reclamarOferta(Long reservaId)
-			throws InstanceNotFoundException, OfertaReclamaDateException {
+			throws InstanceNotFoundException, OfertaReclamaDateException, OfertaReservaDateException {
         try {
             return ofertasProvider.reclamarOferta(reservaId);
         } catch (SoapInstanceNotFoundException ex) {

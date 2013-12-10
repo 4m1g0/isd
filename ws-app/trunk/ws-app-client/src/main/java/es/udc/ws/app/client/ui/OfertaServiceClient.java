@@ -121,14 +121,14 @@ public class OfertaServiceClient {
             	if (args[1] != null) {
             		validateArgs(args, 2, new int[] {});
             		
-	                ofertas = clientOfertaService.findOfertas(args[1], null, Calendar.getInstance());
+	                ofertas = clientOfertaService.findOfertas(args[1], Calendar.getInstance());
 	                System.out.println("Found " + ofertas.size() +
 	                        " oferta(s) with keywords '" + args[1] + "'");
             	}
             	
             	else {
             		validateArgs(args, 1, new int[] {});
-            		ofertas = clientOfertaService.findOfertas(null, null, Calendar.getInstance());
+            		ofertas = clientOfertaService.findOfertas(null, Calendar.getInstance());
             	}
             	
                 for (int i = 0; i < ofertas.size(); i++) {

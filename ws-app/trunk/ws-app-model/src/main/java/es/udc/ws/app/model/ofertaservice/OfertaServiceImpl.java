@@ -51,13 +51,9 @@ public class OfertaServiceImpl implements OfertaService {
         PropertyValidator.validateMandatoryString("descripcion", oferta.getDescripcion());
         PropertyValidator.validateDouble("precioReal", oferta.getPrecioReal(), 0, PRECIO_REAL_MAXIMO);
         PropertyValidator.validateDouble("precioRebajado", oferta.getPrecioRebajado(), 0, PRECIO_REBAJADO_MAXIMO);
-        //FIXME
-        if (oferta.getIniReserva() == null)
-        	PropertyValidator.validatePastDate("iniReserva", oferta.getIniReserva());
-        if (oferta.getLimReserva() == null)
-        	PropertyValidator.validatePastDate("limReserva", oferta.getLimReserva());
-        if (oferta.getLimOferta() == null)
-        	PropertyValidator.validatePastDate("limOferta", oferta.getLimOferta());
+        PropertyValidator.validateDate("iniReserva", oferta.getIniReserva());
+        PropertyValidator.validateDate("limReserva", oferta.getLimReserva());
+        PropertyValidator.validateDate("limOferta", oferta.getLimOferta());
         
         if (oferta.getMaxPersonas() != Short.MAX_VALUE) // maxPersonas = null sin limite
         	PropertyValidator.validateLong("maxPersonas", oferta.getMaxPersonas(), 0, MAX_PERSONAS);
@@ -211,7 +207,7 @@ public class OfertaServiceImpl implements OfertaService {
     public Long reservarOferta(Long ofertaId, String emailUsuario, String numeroTarjeta)
             throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException {
 
-    	// VALIDATE emailUsuario ?
+    	PropertyValidator.validateEmail(emailUsuario);
         PropertyValidator.validateCreditCard(numeroTarjeta);
         
     	Oferta old = findOferta(ofertaId);
