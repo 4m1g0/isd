@@ -72,16 +72,13 @@ public class OfertaServiceTest {
 
 	private Oferta getValidOferta(String titulo) {
 		Calendar before = Calendar.getInstance();
-		//before.set(Calendar.MILLISECOND, 0);
-		//System.out.println(before.getTime().toString());
+		
 		Calendar after = Calendar.getInstance();
-		after.add(Calendar.DAY_OF_MONTH, 1);
-		//after.set(Calendar.MILLISECOND, 30);
-		//System.out.println(after.getTime().toString());
+		after.add(Calendar.MINUTE, 1);
+		
 		Calendar lim = Calendar.getInstance();
-		lim.add(Calendar.DAY_OF_MONTH, 2);
-		//lim.set(Calendar.MILLISECOND, 60);
-		//System.out.println(lim.getTime().toString());
+		lim.add(Calendar.MINUTE, 2);
+		
 		// public Oferta(String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas, short estado) 
 		return new Oferta(titulo, "Oferta description", before, after, lim, 19.95F, 14.95F, (short) 5, Oferta.ESTADO_CREADA);
 	}

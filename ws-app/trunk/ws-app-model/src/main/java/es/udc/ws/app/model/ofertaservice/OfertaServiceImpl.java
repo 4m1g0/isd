@@ -27,7 +27,7 @@ import es.udc.ws.app.model.reserva.SqlReservaDaoFactory;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 import es.udc.ws.util.sql.DataSourceLocator;
-import es.udc.ws.util.validation.PropertyValidator;
+import es.udc.ws.app.validation.PropertyValidator;
 
 public class OfertaServiceImpl implements OfertaService {
     /*
