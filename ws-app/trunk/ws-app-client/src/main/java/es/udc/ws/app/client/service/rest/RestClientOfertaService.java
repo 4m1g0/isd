@@ -33,9 +33,9 @@ import org.jdom2.Document;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-public class RestClientOfertaService implements ClientOfertaService {
+public class RestClientOfertaService {//implements ClientOfertaService {
 
-    private final static String ENDPOINT_ADDRESS_PARAMETER =
+    /*private final static String ENDPOINT_ADDRESS_PARAMETER =
             "RestClientOfertaService.endpointAddress";
     private String endpointAddress;
 
@@ -313,6 +313,8 @@ public class RestClientOfertaService implements ClientOfertaService {
 	            validateResponse(statusCode, HttpStatus.SC_CREATED, method);
 	        /*} catch (InputValidationException | InstanceNotFoundException ex) {
 	            throw ex;*/
+	
+	/*
 	        } catch (Exception ex) {
 	            throw new RuntimeException(ex);
 	        }
@@ -405,4 +407,10 @@ public class RestClientOfertaService implements ClientOfertaService {
         return null;
     }
 
+	@Override
+	public List<OfertaDto> findOfertas(String keywords, Calendar fecha) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+*/
 }
