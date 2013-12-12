@@ -1,7 +1,9 @@
 package es.udc.ws.app.client.ui;
 
-import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import es.udc.ws.app.client.service.ClientOfertaService;
@@ -18,29 +20,34 @@ import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
 public class OfertaServiceClient {
 
-	//Método auxiliar
-	private static Calendar DateToCalendar(Date date){ 
-		  Calendar cal = Calendar.getInstance();
-		  cal.setTime(date);
-		  return cal;
-		}
 	
     public static void main(String[] args) {
 
         if(args.length == 0) {
+        	System.err.println("No args");
             printUsageAndExit();
         }
         ClientOfertaService clientOfertaService =
                 ClientOfertaServiceFactory.getService();
         if("-a".equalsIgnoreCase(args[0])) {
-            validateArgs(args, 10, new int[] {3, 4, 5, 6, 7, 8});
+            validateArgs(args, 9, new int[] {6, 7, 8});
 
+            Long ofertaId = null;
+            
             // [add] OfertaServiceClient -a <titulo> <descripcion> <iniReserva> <limReserva> <limOferta> <precioReal> <precioRebajado> <maxPersonas>
 
             try {
-                Long ofertaId = clientOfertaService.addOferta(new OfertaDto(null,
-                        args[1], args[2], DateToCalendar(Date.valueOf(args[3])), DateToCalendar(Date.valueOf(args[4])), 
-                        DateToCalendar(Date.valueOf(args[5])), Float.valueOf(args[6]), Float.valueOf(args[7]), Short.valueOf(args[8])));
+            	//MaxPersonas not null
+            	if (!args[8].equals("null")) {
+	                ofertaId = clientOfertaService.addOferta(new OfertaDto(null,
+	                        args[1], args[2], DateToCalendar(StringToDate(args[3])), DateToCalendar(StringToDate(args[4])), 
+	                        DateToCalendar(StringToDate(args[5])), Float.valueOf(args[6]), Float.valueOf(args[7]), Short.valueOf(args[8])));
+            	}
+            	else {		
+            		ofertaId = clientOfertaService.addOferta(new OfertaDto(null,
+	                        args[1], args[2], DateToCalendar(StringToDate(args[3])), DateToCalendar(StringToDate(args[4])), 
+	                        DateToCalendar(StringToDate(args[5])), Float.valueOf(args[6]), Float.valueOf(args[7]), Short.MAX_VALUE));
+            	}
 
                 System.out.println("Oferta " + ofertaId + " created sucessfully");
 
@@ -68,16 +75,23 @@ public class OfertaServiceClient {
             }
 
         } else if("-u".equalsIgnoreCase(args[0])) {
-           validateArgs(args, 11, new int[] {1, 4, 5, 6, 7, 8, 9});
+           validateArgs(args, 10, new int[] {1, 7, 8, 9});
 
            // [update] OfertaServiceClient -u <ofertaId> <titulo> <descripcion> <iniReserva> <limReserva> <limOferta> <precioReal> <precioRebajado> <maxPersonas>
 
            try {
-                clientOfertaService.updateOferta(new OfertaDto(
-                        Long.valueOf(args[1]),
-                        args[2], args[3], DateToCalendar(Date.valueOf(args[4])), DateToCalendar(Date.valueOf(args[5])), 
-                        DateToCalendar(Date.valueOf(args[6])), Float.valueOf(args[7]), Float.valueOf(args[8]), Short.valueOf(args[9])));
-
+           		if (!args[9].equals("null")) {
+           			clientOfertaService.updateOferta(new OfertaDto(
+                        Long.parseLong(args[1]),
+                        args[2], args[3], DateToCalendar(StringToDate(args[4])), DateToCalendar(StringToDate(args[5])), 
+                        DateToCalendar(StringToDate(args[6])), Float.valueOf(args[7]), Float.valueOf(args[8]), Short.valueOf(args[9])));
+           		}
+           		else {
+           			clientOfertaService.updateOferta(new OfertaDto(
+                            Long.parseLong(args[1]),
+                            args[2], args[3], DateToCalendar(StringToDate(args[4])), DateToCalendar(StringToDate(args[5])), 
+                            DateToCalendar(StringToDate(args[6])), Float.valueOf(args[7]), Float.valueOf(args[8]), Short.MAX_VALUE));
+           		}
                 System.out.println("Oferta " + args[1] + " updated sucessfully");
 
             } catch (NumberFormatException | InputValidationException |
@@ -188,24 +202,31 @@ public class OfertaServiceClient {
         } else if("-frs".equalsIgnoreCase(args[0])) {
             validateArgs(args, 3, new int[] {1, 2});
 
+            List<ReservaDto> reservas = null;
+            
             // [find] OfertaServiceClient -frs <ofertaId> <estado>
 
             try {
-                List<ReservaDto> reservas = clientOfertaService.findReservas(Long.parseLong(args[1]), Short.valueOf(args[2]));
+            	if (!args[2].equals("null")) 
+            		reservas = clientOfertaService.findReservas(Long.parseLong(args[1]), Short.valueOf(args[2]));
+            	
+            	else
+            		reservas = clientOfertaService.findReservas(Long.parseLong(args[1]), null);
+            		
                 System.out.println("Found " + reservas.size() +
                         " reservas with id '" + args[1] + "'");
                 for (int i = 0; i < reservas.size(); i++) {
                     ReservaDto reservaDto = reservas.get(i);
                     System.out.println("reservaId: " + reservaDto.getReservaId() +
                             " ofertaId: " + reservaDto.getOfertaId() +
-                            " Estado: " + reservaDto.getEstado() +
+                            //" Estado: " + reservaDto.getEstado() +
                             " FechaReserva: " + reservaDto.getFechaReserva());
                             }
             } catch (Exception ex) {
                 ex.printStackTrace(System.err);
             }
         } else if("-ro".equalsIgnoreCase(args[0])) {
-            validateArgs(args, 4, new int[] {1});
+            validateArgs(args, 2, new int[] {1});
 
             // [reclamarOferta] OfertaServiceClient -ro <reservaId>
 
@@ -225,16 +246,42 @@ public class OfertaServiceClient {
         }
     }
 
-    public static void validateArgs(String[] args, int expectedArgs,
+	//Métodos auxiliares
+
+    private static Date StringToDate(String string) {
+    	
+    	SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    	try {
+    		Date date = df.parse(string);
+    		return date;
+
+    		} catch (ParseException ex) {
+
+    		ex.printStackTrace();
+
+    		}
+		return null;
+	}
+
+	private static Calendar DateToCalendar(Date date){ 
+		  Calendar cal = Calendar.getInstance();
+		  cal.setTime(date);
+		  return cal;
+		}
+	
+	public static void validateArgs(String[] args, int expectedArgs,
                                     int[] numericArguments) {
         if(expectedArgs != args.length) {
+        	System.err.println("expectedArgs != args.length");
             printUsageAndExit();
         }
         for(int i = 0 ; i< numericArguments.length ; i++) {
             int position = numericArguments[i];
             try {
-                Double.parseDouble(args[position]);
+            	if (!args[position].equals("null"))
+            		Double.parseDouble(args[position]);
             } catch(NumberFormatException n) {
+            	System.err.println("NumberFormatException");
                 printUsageAndExit();
             }
         }
@@ -251,7 +298,7 @@ public class OfertaServiceClient {
                 "  [remove]         OfertaServiceClient -r <ofertaId>\n" +
                 "  [update]         OfertaServiceClient -u <ofertaId> <titulo> <descripcion> <iniReserva> <limReserva> <limOferta> <precioReal> <precioRebajado> <maxPersonas>\n" +
                 "  [findOferta]     OfertaServiceClient -fo <ofertaId>\n" +  
-                "  [findOfertas]    OfertaServiceClient -fos keywords]\n" +
+                "  [findOfertas]    OfertaServiceClient -fos <keywords>\n" +
                 "  [reservar]       OfertaServiceClient -re <ofertaId> <email> <numeroTarjeta>\n" +
                 "  [findReserva]    OfertaServiceClient -fr <reservaId>\n" +
                 "  [findReservas]   OfertaServiceClient -frs <ofertaId> <estado>\n" +

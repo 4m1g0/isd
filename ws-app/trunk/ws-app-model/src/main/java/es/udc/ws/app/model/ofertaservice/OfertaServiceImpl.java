@@ -1,10 +1,7 @@
 package es.udc.ws.app.model.ofertaservice;
 
-import static es.udc.ws.app.model.util.ModelConstants.MAX_PERSONAS;
 import static es.udc.ws.app.model.util.ModelConstants.NUM_ESTADOS;
 import static es.udc.ws.app.model.util.ModelConstants.OFERTA_DATA_SOURCE;
-import static es.udc.ws.app.model.util.ModelConstants.PRECIO_REAL_MAXIMO;
-import static es.udc.ws.app.model.util.ModelConstants.PRECIO_REBAJADO_MAXIMO;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -49,14 +46,14 @@ public class OfertaServiceImpl implements OfertaService {
 
         PropertyValidator.validateMandatoryString("titulo", oferta.getTitulo());
         PropertyValidator.validateMandatoryString("descripcion", oferta.getDescripcion());
-        PropertyValidator.validateDouble("precioReal", oferta.getPrecioReal(), 0, PRECIO_REAL_MAXIMO);
-        PropertyValidator.validateDouble("precioRebajado", oferta.getPrecioRebajado(), 0, PRECIO_REBAJADO_MAXIMO);
+        PropertyValidator.validateDouble("precioReal", oferta.getPrecioReal(), 0, Float.MAX_VALUE);
+        PropertyValidator.validateDouble("precioRebajado", oferta.getPrecioRebajado(), 0, Float.MAX_VALUE);
         PropertyValidator.validateDate("iniReserva", oferta.getIniReserva());
         PropertyValidator.validateDate("limReserva", oferta.getLimReserva());
         PropertyValidator.validateDate("limOferta", oferta.getLimOferta());
         
         if (oferta.getMaxPersonas() != Short.MAX_VALUE) // maxPersonas = null sin limite
-        	PropertyValidator.validateLong("maxPersonas", oferta.getMaxPersonas(), 0, MAX_PERSONAS);
+        	PropertyValidator.validateLong("maxPersonas", oferta.getMaxPersonas(), 0, Short.MAX_VALUE);
         PropertyValidator.validateLong("estado", oferta.getEstado(), 0, NUM_ESTADOS);
     }
 
@@ -97,15 +94,26 @@ public class OfertaServiceImpl implements OfertaService {
     }
 
     @Override
-    public void updateOferta(Oferta oferta) throws InputValidationException, InstanceNotFoundException, OfertaEstadoException {
+    public void updateOferta(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas) throws InputValidationException, InstanceNotFoundException, OfertaEstadoException {
 
-        validateOferta(oferta);
+        Oferta old = findOferta(ofertaId);
         
-        Oferta old = findOferta(oferta.getOfertaId());
         if (old.getEstado() != Oferta.ESTADO_CREADA) {
-        	throw new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado());
+        	throw new OfertaEstadoException(ofertaId, old.getEstado());
         }
-
+        
+        // Metodos set. Menos costoso que recorrer con un for e ir comparando si es distinto o no.
+        old.setTitulo(titulo);
+        old.setDescripcion(descripcion);
+        old.setIniReserva(iniReserva);
+        old.setLimReserva(limReserva);
+        old.setLimOferta(limOferta);
+        old.setPrecioReal(precioReal);
+        old.setPrecioRebajado(precioRebajado);
+        old.setMaxPersonas(maxPersonas);
+        
+        validateOferta(old);
+        
         try (Connection connection = dataSource.getConnection()) {
 
             try {
@@ -116,7 +124,7 @@ public class OfertaServiceImpl implements OfertaService {
                 connection.setAutoCommit(false);
 
                 /* Do work. */
-                ofertaDao.update(connection, oferta);
+                ofertaDao.update(connection, old);
 
                 /* Commit. */
                 connection.commit();
@@ -214,16 +222,13 @@ public class OfertaServiceImpl implements OfertaService {
     	Calendar now = Calendar.getInstance();
     	Long reservaId = null;
     	
-    	if (old.getMaxPersonas()==MAX_PERSONAS) 
+    	if (old.getMaxPersonas()==findReservas(ofertaId, null).size()) 
         	throw new OfertaMaxPersonasException(ofertaId, old.getMaxPersonas());
     	
     	for (Reserva reserva : findReservas(ofertaId, null)) {
     		if (reserva.getEmailUsuario().equals(emailUsuario))
             	throw new OfertaEmailException(ofertaId, emailUsuario);    		
     	}
-    	
-		//System.out.println("EN EL METODO: \n"+now.getTime().toString());
-		//System.out.println(old.getIniReserva().getTime().toString());
 		
 		if (old.getIniReserva().after(now) || old.getLimReserva().before(now)) {
         	throw new OfertaReservaDateException(ofertaId);    		
@@ -241,7 +246,6 @@ public class OfertaServiceImpl implements OfertaService {
 	    	        if (old.getEstado() == Oferta.ESTADO_CREADA || old.getEstado() == Oferta.ESTADO_LIBERADA) 
 	    	        	old.setEstado(Oferta.ESTADO_COMPROMETIDA);
 	    	        
-	    	    	old.setMaxPersonas((short) (old.getMaxPersonas() + 1));
 	                /* Do work. */
 	                ofertaDao.update(connection, old);
 	                reservaId = reservaDao.create(connection, new Reserva(ofertaId, emailUsuario,

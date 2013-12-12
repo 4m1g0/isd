@@ -48,9 +48,10 @@ public class SoapOfertaService {
     )
     public void updateOferta(@WebParam(name="ofertaDto") OfertaDto ofertaDto)
             throws SoapInputValidationException, SoapInstanceNotFoundException, SoapOfertaEstadoException {
-        Oferta oferta = OfertaToOfertaDtoConversor.toOferta(ofertaDto);
         try {
-            OfertaServiceFactory.getService().updateOferta(oferta);
+            OfertaServiceFactory.getService().updateOferta(ofertaDto.getOfertaId(), ofertaDto.getTitulo(), ofertaDto.getDescripcion(),
+            		ofertaDto.getIniReserva(), ofertaDto.getLimReserva(), ofertaDto.getLimOferta(), ofertaDto.getPrecioReal(),
+            		ofertaDto.getPrecioRebajado(), ofertaDto.getMaxPersonas());
         } catch (InputValidationException ex) {
             throw new SoapInputValidationException(ex.getMessage());
         } catch (InstanceNotFoundException ex) {
@@ -154,7 +155,7 @@ public class SoapOfertaService {
         )
         public List<ReservaDto> findReservas(
                 @WebParam(name="ofertaId") Long ofertaId,
-                @WebParam(name="estado") short estado) throws SoapInstanceNotFoundException {
+                @WebParam(name="estado") Short estado) throws SoapInstanceNotFoundException {
     	try {
             List<Reserva> reservas = OfertaServiceFactory.getService().findReservas(ofertaId, estado);
             return ReservaToReservaDtoConversor.toReservaDtos(reservas);

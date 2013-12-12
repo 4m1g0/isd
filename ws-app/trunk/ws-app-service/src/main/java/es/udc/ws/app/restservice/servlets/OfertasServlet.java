@@ -101,9 +101,10 @@ public class OfertasServlet extends HttpServlet{
             
         }
         Oferta oferta = OfertaToOfertaDtoConversor.toOferta(ofertaDto);
-        oferta.setOfertaId(ofertaId);
         try {
-            OfertaServiceFactory.getService().updateOferta(oferta);
+            OfertaServiceFactory.getService().updateOferta(ofertaId, oferta.getTitulo(), oferta.getDescripcion(),
+            		oferta.getIniReserva(), oferta.getLimReserva(), oferta.getLimOferta(), oferta.getPrecioReal(),
+            		oferta.getPrecioRebajado(), oferta.getMaxPersonas());
         } catch (InputValidationException ex) {
             ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_BAD_REQUEST, 
                     XmlExceptionConversor.toInputValidationExceptionXml(

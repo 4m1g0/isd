@@ -1,11 +1,7 @@
 package es.udc.ws.app.test.model.ofertaservice;
 
-import static es.udc.ws.app.model.util.ModelConstants.MAX_PERSONAS;
 import static es.udc.ws.app.model.util.ModelConstants.NUM_ESTADOS;
 import static es.udc.ws.app.model.util.ModelConstants.OFERTA_DATA_SOURCE;
-import static es.udc.ws.app.model.util.ModelConstants.PRECIO_REAL_MAXIMO;
-import static es.udc.ws.app.model.util.ModelConstants.PRECIO_REBAJADO_MAXIMO;
-import static es.udc.ws.app.model.util.ModelConstants.RESERVA_EXPIRATION_DAYS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -223,19 +219,6 @@ public class OfertaServiceTest {
 				exceptionCatched = true;
 			}
 			assertTrue(exceptionCatched);
-
-			/*/ Check oferta iniReserva in the past
-			exceptionCatched = false;
-			oferta = getValidOferta();
-			Calendar calendar = Calendar.getInstance();
-			calendar.add(Calendar.MINUTE, 1);
-			oferta.setIniReserva(calendar);
-			try {
-				addedOferta = ofertaService.addOferta(oferta);
-			} catch (InputValidationException e) {
-				exceptionCatched = true;
-			}
-			assertTrue(exceptionCatched);*/
 			
 			// Check oferta limReserva not null
 			exceptionCatched = false;
@@ -270,32 +253,10 @@ public class OfertaServiceTest {
 			}
 			assertTrue(exceptionCatched);
 
-			// Check oferta precioReal <= MAX_PRICE
-			exceptionCatched = false;
-			oferta = getValidOferta();
-			oferta.setMaxPersonas((short) (PRECIO_REAL_MAXIMO + 1));
-			try {
-				addedOferta = ofertaService.addOferta(oferta);
-			} catch (InputValidationException e) {
-				exceptionCatched = true;
-			}
-			assertTrue(exceptionCatched);
-
 			// Check oferta precioRebajado >= 0
 			exceptionCatched = false;
 			oferta = getValidOferta();
 			oferta.setPrecioRebajado((short) -1);
-			try {
-				addedOferta = ofertaService.addOferta(oferta);
-			} catch (InputValidationException e) {
-				exceptionCatched = true;
-			}
-			assertTrue(exceptionCatched);
-
-			// Check oferta precioRebajado <= MAX_PRICE
-			exceptionCatched = false;
-			oferta = getValidOferta();
-			oferta.setMaxPersonas((short) (PRECIO_REBAJADO_MAXIMO + 1));
 			try {
 				addedOferta = ofertaService.addOferta(oferta);
 			} catch (InputValidationException e) {
@@ -307,17 +268,6 @@ public class OfertaServiceTest {
 			exceptionCatched = false;
 			oferta = getValidOferta();
 			oferta.setMaxPersonas((short) -1);
-			try {
-				addedOferta = ofertaService.addOferta(oferta);
-			} catch (InputValidationException e) {
-				exceptionCatched = true;
-			}
-			assertTrue(exceptionCatched);
-			
-			// Check oferta maxPersonas <= MAX_PERSONAS
-			exceptionCatched = false;
-			oferta = getValidOferta();
-			oferta.setMaxPersonas((short) (MAX_PERSONAS + 1));
 			try {
 				addedOferta = ofertaService.addOferta(oferta);
 			} catch (InputValidationException e) {
@@ -368,8 +318,9 @@ public class OfertaServiceTest {
 	public void testAddNullMaxPersonasOferta() throws InputValidationException, InstanceNotFoundException, OfertaEstadoException {
 		
 		Oferta oferta = createOferta(getValidOferta());
-		oferta.setMaxPersonas(null);
-		ofertaService.updateOferta(oferta);
+		oferta.setMaxPersonas(null); // Esta linea es porque no podemos pasar un null al ofertaService.update como parametro
+		ofertaService.updateOferta(oferta.getOfertaId(),oferta.getTitulo(),oferta.getDescripcion(),oferta.getIniReserva(),
+				oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());
 		Oferta foundOferta = ofertaService.findOferta(oferta.getOfertaId());
 		assertEquals(oferta, foundOferta);
 
@@ -382,27 +333,22 @@ public class OfertaServiceTest {
 			InstanceNotFoundException, OfertaEstadoException {
 
 		Oferta oferta = createOferta(getValidOferta());
+		
+		//Asi es mas legible que poniendo el valor de los parametros directamente en el ofertaService.updateOferta
+		oferta.setTitulo("new titulo");
+		oferta.setMaxPersonas((short) 5);
+		oferta.setDescripcion("new description");
+		oferta.setPrecioReal(20);
+		
 		try {
 
-			oferta.setTitulo("new titulo");
-			oferta.setMaxPersonas((short) 5);
-			oferta.setDescripcion("new description");
-			oferta.setPrecioReal(20);
-			oferta.setEstado(Oferta.ESTADO_LIBERADA);
-
-			ofertaService.updateOferta(oferta);
-
+			ofertaService.updateOferta(oferta.getOfertaId(),oferta.getTitulo(),oferta.getDescripcion(),oferta.getIniReserva(),
+					oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());
+			
 			Oferta updatedOferta = ofertaService.findOferta(oferta.getOfertaId());
 			assertEquals(oferta, updatedOferta);
 			
-			boolean exceptionCatched = false;
-			try {
-				// actualizar oferta con estado != creada
-				ofertaService.updateOferta(oferta);
-			} catch (Exception e) {
-				exceptionCatched = true;
-			}
-			assertTrue(exceptionCatched);
+			//Mas abajo probamos en otro metodo(testEstadoException) otro caso de update reservando una oferta e intentando actualizarla
 
 		} finally {
 			// Clear Database
@@ -419,9 +365,9 @@ public class OfertaServiceTest {
 		try {
 			// Check oferta titulo not null
 			oferta = ofertaService.findOferta(oferta.getOfertaId());
-			oferta.setTitulo(null);
-			ofertaService.updateOferta(oferta);
-		} finally {
+			ofertaService.updateOferta(oferta.getOfertaId(), null, oferta.getDescripcion(),oferta.getIniReserva(),
+					oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());
+			} finally {
 			// Clear Database
 			removeOferta(oferta.getOfertaId());
 		}
@@ -434,8 +380,8 @@ public class OfertaServiceTest {
 
 		Oferta oferta = getValidOferta();
 		oferta.setOfertaId(NON_EXISTENT_OFERTA_ID);
-		ofertaService.updateOferta(oferta);
-
+		ofertaService.updateOferta(oferta.getOfertaId(),oferta.getTitulo(),oferta.getDescripcion(),oferta.getIniReserva(),
+				oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());
 	}
 
 	@Test
@@ -545,19 +491,8 @@ public class OfertaServiceTest {
 		try {
 			
 			/* Reservar oferta. */
-			Calendar beforeIniReserva = Calendar.getInstance();
-			beforeIniReserva.add(Calendar.DAY_OF_MONTH,
-					RESERVA_EXPIRATION_DAYS);
-			
-			beforeIniReserva.set(Calendar.MILLISECOND, 0);
-
 			Reserva reserva = ofertaService.findReserva(ofertaService.reservarOferta(
 					oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER));
-
-			Calendar afterIniReserva = Calendar.getInstance();
-			afterIniReserva
-					.add(Calendar.DAY_OF_MONTH, RESERVA_EXPIRATION_DAYS);
-			afterIniReserva.set(Calendar.MILLISECOND, 0);
 
 			/* Find reserva. */
 			Reserva foundReserva = ofertaService.findReserva(reserva.getReservaId());
@@ -568,10 +503,6 @@ public class OfertaServiceTest {
 					foundReserva.getNumeroTarjeta());
 			assertEquals(USER_EMAIL, foundReserva.getEmailUsuario());
 			assertEquals(oferta.getOfertaId(), foundReserva.getOfertaId());
-			/*assertTrue((foundReserva.getFechaReserva().compareTo(
-					beforeIniReserva) >= 0));FIXME*/
-			assertTrue((foundReserva.getFechaReserva().compareTo(
-							afterIniReserva) <= 0));
 			assertTrue(Calendar.getInstance().after(
 					foundReserva.getFechaReserva()));
 			
@@ -676,15 +607,18 @@ public class OfertaServiceTest {
 	public void testMaxPersonasException() throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
 		Oferta oferta = createOferta(getValidOferta());
 		try {
-			oferta.setMaxPersonas((short) MAX_PERSONAS);
-			ofertaService.updateOferta(oferta);
-			Reserva reserva = ofertaService.findReserva(ofertaService.reservarOferta(
-					oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER));
-			
-			/* Clear database. */
-			ofertaService.reclamarOferta(reserva.getReservaId());
-			removeReserva(reserva.getReservaId());
+			ofertaService.reservarOferta(oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
+			ofertaService.reservarOferta(oferta.getOfertaId(), "a"+USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
+			ofertaService.reservarOferta(oferta.getOfertaId(), "b"+USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
+			ofertaService.reservarOferta(oferta.getOfertaId(), "c"+USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
+			ofertaService.reservarOferta(oferta.getOfertaId(), "d"+USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
+			ofertaService.reservarOferta(oferta.getOfertaId(), "e"+USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
 		} finally {
+			/* Clear database. */
+			for (Reserva reserva : ofertaService.findReservas(oferta.getOfertaId(), null)) {
+				ofertaService.reclamarOferta(reserva.getReservaId());
+				removeReserva(reserva.getReservaId());
+			}
 			removeOferta(oferta.getOfertaId());
 		}
 	}
@@ -698,8 +632,8 @@ public class OfertaServiceTest {
 					oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER));
 			
 			oferta.setMaxPersonas((short) 2);
-			ofertaService.updateOferta(oferta);
-			
+			ofertaService.updateOferta(oferta.getOfertaId(),oferta.getTitulo(),oferta.getDescripcion(),oferta.getIniReserva(),
+					oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());			
 			/* Clear database. */
 		} finally {
 			ofertaService.reclamarOferta(reserva.getReservaId());

@@ -26,7 +26,7 @@ public class OfertaToOfertaDtoConversor {
     public static Oferta toOferta(OfertaDto oferta) {
         return new Oferta(oferta.getOfertaId(), oferta.getTitulo(), oferta.getDescripcion(), oferta.getIniReserva(), 
         		oferta.getLimReserva(), oferta.getLimOferta(), oferta.getPrecioReal(), 
-        		oferta.getPrecioRebajado(), oferta.getMaxPersonas(), Oferta.ESTADO_CREADA); //FIXME
+        		oferta.getPrecioRebajado(), oferta.getMaxPersonas(), Oferta.ESTADO_CREADA); //Solo se llama al crear una oferta
     }    
     
 }

@@ -31,8 +31,8 @@ public class OfertaDtoToSoapOfertaDtoConversor {
         
         try {
 			soapOfertaDto.setIniReserva(DatatypeFactory.newInstance().newXMLGregorianCalendar(c1));
-	        soapOfertaDto.setIniReserva(DatatypeFactory.newInstance().newXMLGregorianCalendar(c2));
-	        soapOfertaDto.setIniReserva(DatatypeFactory.newInstance().newXMLGregorianCalendar(c3));
+	        soapOfertaDto.setLimReserva(DatatypeFactory.newInstance().newXMLGregorianCalendar(c2));
+	        soapOfertaDto.setLimOferta(DatatypeFactory.newInstance().newXMLGregorianCalendar(c3));
 		} catch (DatatypeConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -17,7 +17,7 @@ public interface OfertaService {
 
     public Oferta addOferta(Oferta oferta) throws InputValidationException;
 
-    public void updateOferta(Oferta oferta) throws InputValidationException,
+    public void updateOferta(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas) throws InputValidationException,
             InstanceNotFoundException, OfertaEstadoException;
 
     public void removeOferta(Long ofertaId) throws InstanceNotFoundException, InputValidationException, OfertaEstadoException;

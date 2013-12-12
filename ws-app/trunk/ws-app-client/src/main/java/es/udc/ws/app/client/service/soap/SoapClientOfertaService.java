@@ -162,8 +162,9 @@ public class SoapClientOfertaService implements ClientOfertaService {
 	public List<ReservaDto> findReservas(Long ofertaId, Short estado)
 			throws InstanceNotFoundException {
 		try {
-	        return OfertaDtoToSoapOfertaDtoConversor.toReservaDtos(
+				return OfertaDtoToSoapOfertaDtoConversor.toReservaDtos(
 	                ofertasProvider.findReservas(ofertaId, estado));
+
 		}
         catch (SoapInstanceNotFoundException ex) {
             throw new InstanceNotFoundException(
