@@ -111,9 +111,9 @@ public class OfertaServiceClient {
                     System.out.println("\nId: " + ofertaDto.getOfertaId() +
                             " Titulo: " + ofertaDto.getTitulo() +
                             " Descripcion: " + ofertaDto.getDescripcion() +
-                            " IniReserva: " + ofertaDto.getIniReserva() +
-                            " LimReserva: " + ofertaDto.getLimReserva() +
-                            " LimOferta: " + ofertaDto.getLimOferta() +
+                            " IniReserva: " + ofertaDto.getIniReserva().getTime() +
+                            " LimReserva: " + ofertaDto.getLimReserva().getTime() +
+                            " LimOferta: " + ofertaDto.getLimOferta().getTime() +
                             " PrecioReal: " + ofertaDto.getPrecioReal() +
                     		" PrecioRebajado: " + ofertaDto.getPrecioRebajado() +
                             " MaxPersonas: " + ofertaDto.getMaxPersonas());
@@ -150,9 +150,9 @@ public class OfertaServiceClient {
                     System.out.println("\nId: " + ofertaDto.getOfertaId() +
                             " Titulo: " + ofertaDto.getTitulo() +
                             " Descripcion: " + ofertaDto.getDescripcion() +
-                            " IniReserva: " + ofertaDto.getIniReserva() +
-                            " LimReserva: " + ofertaDto.getLimReserva() +
-                            " LimOferta: " + ofertaDto.getLimOferta() +
+                            " IniReserva: " + ofertaDto.getIniReserva().getTime() +
+                            " LimReserva: " + ofertaDto.getLimReserva().getTime() +
+                            " LimOferta: " + ofertaDto.getLimOferta().getTime() +
                             " PrecioReal: " + ofertaDto.getPrecioReal() +
                     		" PrecioRebajado: " + ofertaDto.getPrecioRebajado() +
                             " MaxPersonas: " + ofertaDto.getMaxPersonas());
@@ -194,7 +194,7 @@ public class OfertaServiceClient {
                     System.out.println("\nreservaId: " + reservaDto.getReservaId() +
                             " ofertaId: " + reservaDto.getOfertaId() +
                             " Estado: " + reservaDto.getEstado() +
-                            " FechaReserva: " + reservaDto.getFechaReserva());
+                            " FechaReserva: " + reservaDto.getFechaReserva().getTime());
                     
             } catch (Exception ex) {
                 ex.printStackTrace(System.err);
@@ -213,14 +213,13 @@ public class OfertaServiceClient {
             	else
             		reservas = clientOfertaService.findReservas(Long.parseLong(args[1]), null);
             		
-                System.out.println("\nFound " + reservas.size() +
-                        " reservas with id '" + args[1] + "'");
+                System.out.println("\nFound " + reservas.size() +" reservas");
                 for (int i = 0; i < reservas.size(); i++) {
                     ReservaDto reservaDto = reservas.get(i);
                     System.out.println("\nreservaId: " + reservaDto.getReservaId() +
                             " ofertaId: " + reservaDto.getOfertaId() +
-                            //" Estado: " + reservaDto.getEstado() +
-                            " FechaReserva: " + reservaDto.getFechaReserva());
+                            " Estado: " + reservaDto.getEstado() +
+                            " FechaReserva: " + reservaDto.getFechaReserva().getTime());
                             }
             } catch (Exception ex) {
                 ex.printStackTrace(System.err);

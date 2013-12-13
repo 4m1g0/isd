@@ -189,7 +189,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
 
 	@Override
 	public boolean reclamarOferta(Long reservaId)
-			throws InstanceNotFoundException, OfertaReclamaDateException, OfertaReservaDateException {
+			throws InstanceNotFoundException, OfertaReclamaDateException {
         try {
             return ofertasProvider.reclamarOferta(reservaId);
         } catch (SoapInstanceNotFoundException ex) {
@@ -198,7 +198,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
                     ex.getFaultInfo().getInstanceType());
         }
         catch (SoapOfertaReclamaDateException ex) {
-            throw new OfertaReservaDateException(ex.getFaultInfo().getOfertaId());
+            throw new OfertaReclamaDateException(ex.getFaultInfo().getOfertaId());
         }
         catch(Exception ex) {
             throw new RuntimeException(ex);
