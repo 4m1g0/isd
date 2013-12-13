@@ -604,6 +604,96 @@ public class OfertaServiceTest {
 		ofertaService.findReserva(NON_EXISTENT_RESERVA_ID);
 	}
 	
+	//iniReserva > limReserva
+	@Test(expected = InputValidationException.class)
+	public void testSetDatesWrong1() throws InstanceNotFoundException, InputValidationException, OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
+
+		Oferta oferta = createOferta(getValidOferta());
+		
+		try {
+			
+			Calendar before = Calendar.getInstance();
+			before.add(Calendar.DAY_OF_MONTH, 5);		
+			oferta.setIniReserva(before);
+			
+			Calendar after = Calendar.getInstance();
+			after.add(Calendar.DAY_OF_MONTH, 3);
+			oferta.setLimReserva(after);
+			
+			Calendar lim = Calendar.getInstance();
+			lim.add(Calendar.DAY_OF_MONTH, 6);
+			oferta.setLimOferta(lim);			
+
+			ofertaService.updateOferta(oferta.getOfertaId(),oferta.getTitulo(),oferta.getDescripcion(),oferta.getIniReserva(),
+					oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());
+
+		} 
+		finally {
+			/* Clear database. */
+			removeOferta(oferta.getOfertaId());
+		}
+	}
+	
+	//iniReserva > limOferta
+	@Test(expected = InputValidationException.class)
+	public void testSetDatesWrong2() throws InstanceNotFoundException, InputValidationException, OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
+
+		Oferta oferta = createOferta(getValidOferta());
+		
+		try {
+			
+			Calendar before = Calendar.getInstance();
+			before.add(Calendar.DAY_OF_MONTH, 2);		
+			oferta.setIniReserva(before);
+			
+			Calendar after = Calendar.getInstance();
+			after.add(Calendar.DAY_OF_MONTH, 3);
+			oferta.setLimReserva(after);
+			
+			Calendar lim = Calendar.getInstance();
+			lim.add(Calendar.DAY_OF_MONTH, 1);
+			oferta.setLimOferta(lim);			
+
+			ofertaService.updateOferta(oferta.getOfertaId(),oferta.getTitulo(),oferta.getDescripcion(),oferta.getIniReserva(),
+					oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());
+
+		} 
+		finally {
+			/* Clear database. */
+			removeOferta(oferta.getOfertaId());
+		}
+	}
+	
+	// limOferta > limReserva
+	@Test(expected = InputValidationException.class)
+	public void testSetDatesWrong3() throws InstanceNotFoundException, InputValidationException, OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
+
+		Oferta oferta = createOferta(getValidOferta());
+		
+		try {
+			
+			Calendar before = Calendar.getInstance();
+			before.add(Calendar.DAY_OF_MONTH, 1);		
+			oferta.setIniReserva(before);
+			
+			Calendar after = Calendar.getInstance();
+			after.add(Calendar.DAY_OF_MONTH, 3);
+			oferta.setLimReserva(after);
+			
+			Calendar lim = Calendar.getInstance();
+			lim.add(Calendar.DAY_OF_MONTH, 2);
+			oferta.setLimOferta(lim);			
+
+			ofertaService.updateOferta(oferta.getOfertaId(),oferta.getTitulo(),oferta.getDescripcion(),oferta.getIniReserva(),
+					oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());
+
+		} 
+		finally {
+			/* Clear database. */
+			removeOferta(oferta.getOfertaId());
+		}
+	}
+	
 	@Test(expected = OfertaMaxPersonasException.class)
 	public void testMaxPersonasException() throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
 		Oferta oferta = createOferta(getValidOferta());
@@ -673,6 +763,7 @@ public class OfertaServiceTest {
 
 		try {
 
+			//
 			Calendar before = Calendar.getInstance();
 			before.add(Calendar.DAY_OF_MONTH, 2);		
 			oferta.setIniReserva(before);

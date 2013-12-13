@@ -63,10 +63,10 @@ public class OfertaServiceImpl implements OfertaService {
         validateOferta(oferta);
         
         if (oferta.getIniReserva().after(oferta.getLimReserva()))
-        	throw new InputValidationException("Invalid reserva dates, start reserva '<=' lim reserva");
+        	throw new InputValidationException("Invalid reserva dates, start reserva '>' lim reserva");
         
-        /*if (oferta.getIniReserva().after(oferta.getLimOferta()))
-        	throw new InputValidationException("Invalid reserva dates, start reserva '<=' lim reclamar oferta");*/
+        if (oferta.getLimReserva().after(oferta.getLimOferta()))
+        	throw new InputValidationException("Invalid reserva dates, lim reserva '>' lim reclamar oferta");
         
         try (Connection connection = dataSource.getConnection()) {
 
@@ -109,10 +109,10 @@ public class OfertaServiceImpl implements OfertaService {
         }
         
         if (iniReserva.after(limReserva))
-        	throw new InputValidationException("Invalid reserva dates, start reserva '<=' lim reserva");
+        	throw new InputValidationException("Invalid reserva dates, start reserva '>' lim reserva");
         
-        /*if (iniReserva.after(limOferta))
-        	throw new InputValidationException("Invalid reserva dates, start reserva '<=' lim reclamar oferta");*/
+        if (limReserva.after(limOferta))
+        	throw new InputValidationException("Invalid reserva dates, lim reserva '>' lim reclamar oferta");
         
         // Metodos set. Menos costoso que recorrer con un for e ir comparando si es distinto o no.
         old.setTitulo(titulo);
