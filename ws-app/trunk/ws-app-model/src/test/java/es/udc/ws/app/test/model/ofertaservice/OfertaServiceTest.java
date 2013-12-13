@@ -48,6 +48,7 @@ public class OfertaServiceTest {
 
 	private static SqlReservaDao reservaDao = null;
 
+	
 	@BeforeClass
 	public static void init() {
 
@@ -670,31 +671,70 @@ public class OfertaServiceTest {
 		Oferta oferta = createOferta(getValidOferta());
 		Oferta oferta2 = null;
 
-		Reserva reserva = null;
 		try {
 
 			Calendar before = Calendar.getInstance();
 			before.add(Calendar.DAY_OF_MONTH, 2);		
 			oferta.setIniReserva(before);
 			
+			//Estos dos Calendar para que tenga coherencia y no salten excepciones al añadir la oferta
 			Calendar after = Calendar.getInstance();
 			after.add(Calendar.DAY_OF_MONTH, 3);
 			oferta.setLimReserva(after);
-
+			
+			Calendar lim = Calendar.getInstance();
+			lim.add(Calendar.DAY_OF_MONTH, 4);
+			oferta.setLimOferta(lim);
 			oferta2 = ofertaService.addOferta(oferta);
-			
-			reserva = ofertaService.findReserva(ofertaService.reservarOferta(
-					oferta2.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER));
-			
+
+			ofertaService.reservarOferta(
+					oferta2.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
+			//Vamos a limpiar la segunda oferta en el siguiente metodo donde solo se reclama
 			
 			/* Clear database. */
-			ofertaService.reclamarOferta(reserva.getReservaId());
-			removeReserva(reserva.getReservaId());
 		} 
 		finally {
 
 			removeOferta(oferta.getOfertaId());
 			removeOferta(oferta2.getOfertaId());
+		}
+	}
+	
+	//Test comentado porque no podemos cambiar las fechas de una oferta reservada para que se reclame
+	 // y tampoco antes de reservarse porque iniReserva <= limReserva <= limOferta
+	// En resumen para comprobarlo habria que esperar a que en la oferta caducara su limite para disfrutarla
+	//@Test(expected = OfertaReclamaDateException.class)
+	public void testReclamaDateException() throws InstanceNotFoundException, InputValidationException, OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
+
+		Oferta oferta = createOferta(getValidOferta());
+		Reserva reserva = null;
+		
+		try {
+
+			reserva = ofertaService.findReserva(ofertaService.reservarOferta(
+					oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER));
+			
+			Calendar before = Calendar.getInstance();
+			before.add(Calendar.DAY_OF_MONTH, -4);		
+			oferta.setIniReserva(before);
+			
+			Calendar after = Calendar.getInstance();
+			after.add(Calendar.DAY_OF_MONTH, -3);
+			oferta.setLimReserva(after);
+			
+			Calendar lim = Calendar.getInstance();
+			lim.add(Calendar.DAY_OF_MONTH, -2);
+			oferta.setLimOferta(lim);			
+
+			ofertaService.updateOferta(oferta.getOfertaId(),oferta.getTitulo(),oferta.getDescripcion(),oferta.getIniReserva(),
+					oferta.getLimReserva(),oferta.getLimOferta(),oferta.getPrecioReal(),oferta.getPrecioRebajado(),oferta.getMaxPersonas());
+
+			ofertaService.reclamarOferta(reserva.getReservaId());
+			removeReserva(reserva.getReservaId());
+		} 
+		finally {
+			/* Clear database. */
+			removeOferta(oferta.getOfertaId());
 		}
 	}
 }

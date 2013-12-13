@@ -24,7 +24,7 @@ public class OfertaServiceClient {
     public static void main(String[] args) {
 
         if(args.length == 0) {
-        	System.err.println("No args");
+        	System.err.println("\nNo args");
             printUsageAndExit();
         }
         ClientOfertaService clientOfertaService =
@@ -49,7 +49,7 @@ public class OfertaServiceClient {
 	                        DateToCalendar(StringToDate(args[5])), Float.valueOf(args[6]), Float.valueOf(args[7]), Short.MAX_VALUE));
             	}
 
-                System.out.println("Oferta " + ofertaId + " created sucessfully");
+                System.out.println("\nOferta " + ofertaId + " created sucessfully");
 
             } catch (NumberFormatException | InputValidationException ex) {
                 ex.printStackTrace(System.err);
@@ -65,7 +65,7 @@ public class OfertaServiceClient {
             try {
                 clientOfertaService.removeOferta(Long.parseLong(args[1]));
 
-                System.out.println("Oferta with id " + args[1] +
+                System.out.println("\nOferta with id " + args[1] +
                         " removed sucessfully");
 
             } catch (NumberFormatException | OfertaEstadoException | InstanceNotFoundException ex) {
@@ -92,7 +92,7 @@ public class OfertaServiceClient {
                             args[2], args[3], DateToCalendar(StringToDate(args[4])), DateToCalendar(StringToDate(args[5])), 
                             DateToCalendar(StringToDate(args[6])), Float.valueOf(args[7]), Float.valueOf(args[8]), Short.MAX_VALUE));
            		}
-                System.out.println("Oferta " + args[1] + " updated sucessfully");
+                System.out.println("\nOferta " + args[1] + " updated sucessfully");
 
             } catch (NumberFormatException | InputValidationException |
                      InstanceNotFoundException | OfertaEstadoException ex) {
@@ -108,7 +108,7 @@ public class OfertaServiceClient {
 
             try {
                 OfertaDto ofertaDto = clientOfertaService.findOferta(Long.valueOf(args[1]));
-                    System.out.println("Id: " + ofertaDto.getOfertaId() +
+                    System.out.println("\nId: " + ofertaDto.getOfertaId() +
                             " Titulo: " + ofertaDto.getTitulo() +
                             " Descripcion: " + ofertaDto.getDescripcion() +
                             " IniReserva: " + ofertaDto.getIniReserva() +
@@ -136,7 +136,7 @@ public class OfertaServiceClient {
             		validateArgs(args, 2, new int[] {});
             		
 	                ofertas = clientOfertaService.findOfertas(args[1], Calendar.getInstance());
-	                System.out.println("Found " + ofertas.size() +
+	                System.out.println("\nFound " + ofertas.size() +
 	                        " oferta(s) with keywords '" + args[1] + "'");
             	}
             	
@@ -147,7 +147,7 @@ public class OfertaServiceClient {
             	
                 for (int i = 0; i < ofertas.size(); i++) {
                     OfertaDto ofertaDto = ofertas.get(i);
-                    System.out.println("Id: " + ofertaDto.getOfertaId() +
+                    System.out.println("\nId: " + ofertaDto.getOfertaId() +
                             " Titulo: " + ofertaDto.getTitulo() +
                             " Descripcion: " + ofertaDto.getDescripcion() +
                             " IniReserva: " + ofertaDto.getIniReserva() +
@@ -173,7 +173,7 @@ public class OfertaServiceClient {
                 reservaId = clientOfertaService.reservarOferta(Long.parseLong(args[1]),
                         args[2], args[3]);
 
-                System.out.println("Oferta " + args[1] +
+                System.out.println("\nOferta " + args[1] +
                         " reservada sucessfully with reserva number " +
                         reservaId);
 
@@ -191,7 +191,7 @@ public class OfertaServiceClient {
 
             try {
                 ReservaDto reservaDto = clientOfertaService.findReserva(Long.parseLong(args[1]));
-                    System.out.println("reservaId: " + reservaDto.getReservaId() +
+                    System.out.println("\nreservaId: " + reservaDto.getReservaId() +
                             " ofertaId: " + reservaDto.getOfertaId() +
                             " Estado: " + reservaDto.getEstado() +
                             " FechaReserva: " + reservaDto.getFechaReserva());
@@ -213,11 +213,11 @@ public class OfertaServiceClient {
             	else
             		reservas = clientOfertaService.findReservas(Long.parseLong(args[1]), null);
             		
-                System.out.println("Found " + reservas.size() +
+                System.out.println("\nFound " + reservas.size() +
                         " reservas with id '" + args[1] + "'");
                 for (int i = 0; i < reservas.size(); i++) {
                     ReservaDto reservaDto = reservas.get(i);
-                    System.out.println("reservaId: " + reservaDto.getReservaId() +
+                    System.out.println("\nreservaId: " + reservaDto.getReservaId() +
                             " ofertaId: " + reservaDto.getOfertaId() +
                             //" Estado: " + reservaDto.getEstado() +
                             " FechaReserva: " + reservaDto.getFechaReserva());
@@ -232,9 +232,9 @@ public class OfertaServiceClient {
 
             try {
                 if (!clientOfertaService.reclamarOferta(Long.parseLong(args[1])))
-                	System.out.println("Oferta " + args[1] + " reclamacion fallada..");
+                	System.out.println("\nClaimed failed..");
                 else
-                	System.out.println("Oferta " + args[1] + " reclamada sucessfully!");
+                	System.out.println("\nClaimed sucessfully!");
 
             } 
             catch (OfertaReclamaDateException ex) {
@@ -272,7 +272,7 @@ public class OfertaServiceClient {
 	public static void validateArgs(String[] args, int expectedArgs,
                                     int[] numericArguments) {
         if(expectedArgs != args.length) {
-        	System.err.println("expectedArgs != args.length");
+        	System.err.println("\nexpectedArgs != args.length");
             printUsageAndExit();
         }
         for(int i = 0 ; i< numericArguments.length ; i++) {
@@ -281,7 +281,7 @@ public class OfertaServiceClient {
             	if (!args[position].equals("null"))
             		Double.parseDouble(args[position]);
             } catch(NumberFormatException n) {
-            	System.err.println("NumberFormatException");
+            	System.err.println("\nNumberFormatException");
                 printUsageAndExit();
             }
         }
@@ -293,7 +293,7 @@ public class OfertaServiceClient {
     }
 
     public static void printUsage() {
-        System.err.println("Usage:\n" +
+        System.err.println("\nUsage:\n" +
                 "  [add]            OfertaServiceClient -a <titulo> <descripcion> <iniReserva> <limReserva> <limOferta> <precioReal> <precioRebajado> <maxPersonas>\n" +
                 "  [remove]         OfertaServiceClient -r <ofertaId>\n" +
                 "  [update]         OfertaServiceClient -u <ofertaId> <titulo> <descripcion> <iniReserva> <limReserva> <limOferta> <precioReal> <precioRebajado> <maxPersonas>\n" +
