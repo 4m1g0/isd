@@ -18,10 +18,18 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.jdom2.Document;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import es.udc.ws.app.client.service.ClientOfertaService;
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
+import es.udc.ws.app.exceptions.OfertaEmailException;
+import es.udc.ws.app.exceptions.OfertaEstadoException;
+import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
+import es.udc.ws.app.exceptions.OfertaReclamaDateException;
+import es.udc.ws.app.exceptions.OfertaReservaDateException;
 import es.udc.ws.app.xml.ParsingException;
 import es.udc.ws.app.xml.XmlExceptionConversor;
 import es.udc.ws.app.xml.XmlOfertaDtoConversor;
@@ -29,13 +37,10 @@ import es.udc.ws.app.xml.XmlReservaDtoConversor;
 import es.udc.ws.util.configuration.ConfigurationParametersManager;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
-import org.jdom2.Document;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
-public class RestClientOfertaService {//implements ClientOfertaService {
+public class RestClientOfertaService implements ClientOfertaService {
 
-    /*private final static String ENDPOINT_ADDRESS_PARAMETER =
+    private final static String ENDPOINT_ADDRESS_PARAMETER =
             "RestClientOfertaService.endpointAddress";
     private String endpointAddress;
 
@@ -146,7 +151,7 @@ public class RestClientOfertaService {//implements ClientOfertaService {
     }
 
     @Override
-    public List<OfertaDto> findOfertas(String keywords, Short estado, Calendar fecha) {
+    public List<OfertaDto> findOfertas(String keywords, Calendar fecha) {
         GetMethod method = null;
         try {
             method = new GetMethod(getEndpointAddress() + "ofertas/?keywords="
@@ -181,7 +186,7 @@ public class RestClientOfertaService {//implements ClientOfertaService {
 	@Override
 	public OfertaDto findOferta(Long ofertaId) throws InstanceNotFoundException {
 	    GetMethod method = null;
-	    method = new GetMethod(getEndpointAddress() + "reserva");
+	    method = new GetMethod(getEndpointAddress() + "ofertas/" + ofertaId);
 	    try {
 	        HttpClient client = new HttpClient();
 	        int statusCode;
@@ -240,7 +245,7 @@ public class RestClientOfertaService {//implements ClientOfertaService {
 	@Override
 	public List<ReservaDto> findReservas(Long ofertaId, Short estado) {
 	    GetMethod method = null;
-	    method = new GetMethod(getEndpointAddress() + "reservas");
+	    method = new GetMethod(getEndpointAddress() + "reservas/" + ofertaId + "&estado=" + estado);
 	    try {
 	        HttpClient client = new HttpClient();
 	        int statusCode;
@@ -269,7 +274,7 @@ public class RestClientOfertaService {//implements ClientOfertaService {
 	@Override
 	public ReservaDto findReserva(Long reservaId) {
 	    GetMethod method = null;
-	    method = new GetMethod(getEndpointAddress() + "reserva");
+	    method = new GetMethod(getEndpointAddress() + "reservas/");
 	    try {
 	        HttpClient client = new HttpClient();
 	        int statusCode;
@@ -297,7 +302,7 @@ public class RestClientOfertaService {//implements ClientOfertaService {
 	@Override
 	public boolean reclamarOferta(Long reservaId)
         throws InstanceNotFoundException {
-	    PostMethod method = new PostMethod(getEndpointAddress() + "reclamacion");
+	    PostMethod method = new PostMethod(getEndpointAddress() + "reservas");
 	    try {
 	        method.addParameter("reservaId", Long.toString(reservaId));
 	
@@ -311,10 +316,10 @@ public class RestClientOfertaService {//implements ClientOfertaService {
 	        }
 	        try {
 	            validateResponse(statusCode, HttpStatus.SC_CREATED, method);
-	        /*} catch (InputValidationException | InstanceNotFoundException ex) {
-	            throw ex;*/
+	        } catch (InstanceNotFoundException ex) {
+	            throw ex;
 	
-	/*
+	
 	        } catch (Exception ex) {
 	            throw new RuntimeException(ex);
 	        }
@@ -338,8 +343,8 @@ public class RestClientOfertaService {//implements ClientOfertaService {
     private void validateResponse(int statusCode,
                                   int expectedStatusCode,
                                   HttpMethod method)
-            throws InstanceNotFoundException,
-            ReservaExpirationException, InputValidationException,
+            throws InstanceNotFoundException, InputValidationException, OfertaEstadoException, 
+            OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaReclamaDateException,
             ParsingException {
 
         InputStream in;
@@ -373,7 +378,7 @@ public class RestClientOfertaService {//implements ClientOfertaService {
             case HttpStatus.SC_GONE:
                 try {
                     throw XmlExceptionConversor
-                            .fromReservaExpirationExceptionXml(in);
+                            .fromOfertaReservaDateExceptionXml(in);
                 } catch (ParsingException e) {
                     throw new RuntimeException(e);
                 }
@@ -406,11 +411,4 @@ public class RestClientOfertaService {//implements ClientOfertaService {
         }
         return null;
     }
-
-	@Override
-	public List<OfertaDto> findOfertas(String keywords, Calendar fecha) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-*/
 }

@@ -1,6 +1,7 @@
 package es.udc.ws.app.restservice.servlets;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,9 +120,11 @@ public class OfertasServlet extends HttpServlet{
                     null);       
             return;
         } catch (OfertaEstadoException e) {
-            //ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_NOT_FOUND, 
-                    //XmlExceptionConversor.toOfertaEstadoException( new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado());
-			e.printStackTrace();
+            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_GONE, 
+                    XmlExceptionConversor.toOfertaEstadoException(
+                    new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado())),
+                    null);
+            return;
 		}
         ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_NO_CONTENT, 
                 null, null);        
@@ -152,7 +155,9 @@ public class OfertasServlet extends HttpServlet{
             
             return;
         }
-        try {
+        Oferta oferta = null;
+		try {
+            oferta = OfertaServiceFactory.getService().findOferta(ofertaId);
             OfertaServiceFactory.getService().removeOferta(ofertaId);
         } catch (InstanceNotFoundException ex) {
            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_NOT_FOUND,
@@ -162,11 +167,17 @@ public class OfertasServlet extends HttpServlet{
                     ex.getInstanceType())), null);
             return;
         } catch (InputValidationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_BAD_REQUEST, 
+                    XmlExceptionConversor.toInputValidationExceptionXml(
+                    new InputValidationException(e.getMessage())), 
+                    null);
+            return;
 		} catch (OfertaEstadoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_GONE, 
+                    XmlExceptionConversor.toOfertaEstadoException(
+                    new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado())),
+                    null);
+            return;
 		}
         ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_NO_CONTENT, 
                 null, null);
@@ -179,7 +190,7 @@ public class OfertasServlet extends HttpServlet{
         if(path == null || path.length() == 0 || "/".equals(path)) {
             String keyWords = req.getParameter("keywords");
             List<Oferta> ofertas = OfertaServiceFactory.getService()
-                    .findOfertas(keyWords, null, null); //FIXME
+                    .findOfertas(keyWords, null, Calendar.getInstance());
             List<OfertaDto> ofertaDtos = OfertaToOfertaDtoConversor
                     .toOfertaDtos(ofertas);
             ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_OK,

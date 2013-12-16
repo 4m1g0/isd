@@ -207,8 +207,8 @@ public class XmlOfertaDtoConversor {
         short maxPersonas = Short.valueOf(
                 ofertaElement.getChildTextTrim("maxPersonas", XML_NS));
 
-        short estado = Short.valueOf(
-                ofertaElement.getChildTextTrim("estado", XML_NS));
+        /*short estado = Short.valueOf(
+                ofertaElement.getChildTextTrim("estado", XML_NS));*/
 
         return new OfertaDto(identifier, titulo, descripcion, iniReserva, limReserva, limOferta, 
         		precioReal, precioRebajado, maxPersonas);

@@ -13,6 +13,7 @@ import es.udc.ws.app.dto.ReservaDto;
 import es.udc.ws.app.exceptions.OfertaEmailException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.app.model.ofertaservice.OfertaServiceFactory;
 import es.udc.ws.app.model.reserva.Reserva;
 import es.udc.ws.app.serviceutil.ReservaToReservaDtoConversor;
@@ -66,8 +67,10 @@ public class ReservasServlet extends HttpServlet {
 
             return;
         }
+        Oferta oferta = null;
         Reserva reserva = null;
         try {
+            oferta = OfertaServiceFactory.getService().findOferta(ofertaId);
             reserva = OfertaServiceFactory.getService().findReserva(OfertaServiceFactory.getService()
                     .reservarOferta(ofertaId, emailUsuario, numeroTarjeta));
         } catch (InstanceNotFoundException ex) {
@@ -82,14 +85,21 @@ public class ReservasServlet extends HttpServlet {
                     new InputValidationException(ex.getMessage())), null);
             return;
         } catch (OfertaMaxPersonasException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_GONE, 
+                    XmlExceptionConversor.toOfertaMaxPersonasException(
+                    new OfertaMaxPersonasException(ofertaId, oferta.getMaxPersonas())),
+                    null);
+            return;
 		} catch (OfertaEmailException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_BAD_REQUEST,
+                    XmlExceptionConversor.toOfertaEmailException(
+                    new OfertaEmailException(ofertaId, emailUsuario)), null);
+            return;
 		} catch (OfertaReservaDateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_GONE, 
+                    XmlExceptionConversor.toOfertaReservaDateException(
+                    new OfertaReservaDateException(ofertaId)), null);
+            return;	
 		}
         ReservaDto reservaDto = ReservaToReservaDtoConversor.toReservaDto(reserva);
 
@@ -135,12 +145,7 @@ public class ReservasServlet extends HttpServlet {
                     new InstanceNotFoundException(ex.getInstanceId()
                         .toString(),ex.getInstanceType())), null);
            return;
-        } /*catch (ReservaExpirationException ex) {
-            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_GONE,
-                    XmlExceptionConversor.toReservaExpirationException(ex), null);
-
-            return;
-        }*/
+        }
 
         ReservaDto reservaDto = ReservaToReservaDtoConversor.toReservaDto(reserva);
 

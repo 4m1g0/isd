@@ -96,8 +96,6 @@ public class XmlReservaDtoConversor {
         Calendar fechaReserva = getFecha(reservaElement.getChild(
                 "fechaReserva", XML_NS));
 
-        String ofertaUrl = reservaElement.getChildTextTrim("ofertaUrl", XML_NS);
-
         return new ReservaDto(reservaId, ofertaId, estado, fechaReserva);
     }
 
