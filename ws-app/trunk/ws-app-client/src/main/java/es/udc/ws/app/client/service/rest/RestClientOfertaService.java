@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.httpclient.Header;
@@ -151,7 +150,7 @@ public class RestClientOfertaService implements ClientOfertaService {
     }
 
     @Override
-    public List<OfertaDto> findOfertas(String keywords, Calendar fecha) {
+    public List<OfertaDto> findOfertas(String keywords) {
         GetMethod method = null;
         try {
             method = new GetMethod(getEndpointAddress() + "ofertas/?keywords="

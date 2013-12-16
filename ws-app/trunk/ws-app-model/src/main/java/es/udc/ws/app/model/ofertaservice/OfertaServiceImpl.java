@@ -60,23 +60,22 @@ public class OfertaServiceImpl implements OfertaService {
     @Override
     public Oferta addOferta(Oferta oferta) throws InputValidationException {
 
-        validateOferta(oferta);
-        
-        if (oferta.getIniReserva().after(oferta.getLimReserva()))
-        	throw new InputValidationException("Invalid reserva dates, start reserva '>' lim reserva");
-        
-        if (oferta.getLimReserva().after(oferta.getLimOferta()))
-        	throw new InputValidationException("Invalid reserva dates, lim reserva '>' lim reclamar oferta");
-        
         try (Connection connection = dataSource.getConnection()) {
-
             try {
-
                 /* Prepare connection. */
                 connection
                         .setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
                 connection.setAutoCommit(false);
 
+                validateOferta(oferta);
+
+                /* Checks */
+                if (oferta.getIniReserva().after(oferta.getLimReserva()))
+                	throw new InputValidationException("Invalid reserva dates, start reserva '>' lim reserva");
+                
+                if (oferta.getLimReserva().after(oferta.getLimOferta()))
+                	throw new InputValidationException("Invalid reserva dates, lim reserva '>' lim reclamar oferta");
+                
                 /* Do work. */
                 Oferta createdOferta = ofertaDao.create(connection, oferta);
 
@@ -102,39 +101,39 @@ public class OfertaServiceImpl implements OfertaService {
     @Override
     public void updateOferta(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas) throws InputValidationException, InstanceNotFoundException, OfertaEstadoException {
 
-        Oferta old = findOferta(ofertaId);
-        
-        if (old.getEstado() != Oferta.ESTADO_CREADA) {
-        	throw new OfertaEstadoException(ofertaId, old.getEstado());
-        }
-        
-        if (iniReserva.after(limReserva))
-        	throw new InputValidationException("Invalid reserva dates, start reserva '>' lim reserva");
-        
-        if (limReserva.after(limOferta))
-        	throw new InputValidationException("Invalid reserva dates, lim reserva '>' lim reclamar oferta");
-        
-        // Metodos set. Menos costoso que recorrer con un for e ir comparando si es distinto o no.
-        old.setTitulo(titulo);
-        old.setDescripcion(descripcion);
-        old.setIniReserva(iniReserva);
-        old.setLimReserva(limReserva);
-        old.setLimOferta(limOferta);
-        old.setPrecioReal(precioReal);
-        old.setPrecioRebajado(precioRebajado);
-        old.setMaxPersonas(maxPersonas);
-        
-        validateOferta(old);
-        
         try (Connection connection = dataSource.getConnection()) {
-
             try {
-
                 /* Prepare connection. */
                 connection
                         .setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
                 connection.setAutoCommit(false);
 
+                /* Sets y validation */
+                Oferta old = findOferta(ofertaId);
+                
+                //Menos costoso que recorrer con un for e ir comparando si es distinto o no.
+                old.setTitulo(titulo);
+                old.setDescripcion(descripcion);
+                old.setIniReserva(iniReserva);
+                old.setLimReserva(limReserva);
+                old.setLimOferta(limOferta);
+                old.setPrecioReal(precioReal);
+                old.setPrecioRebajado(precioRebajado);
+                old.setMaxPersonas(maxPersonas);
+                
+                validateOferta(old);
+                
+                /* Checks */
+                if (old.getEstado() != Oferta.ESTADO_CREADA) {
+                	throw new OfertaEstadoException(ofertaId, old.getEstado());
+                }
+                
+                if (iniReserva.after(limReserva))
+                	throw new InputValidationException("Invalid reserva dates, start reserva '>' lim reserva");
+                
+                if (limReserva.after(limOferta))
+                	throw new InputValidationException("Invalid reserva dates, lim reserva '>' lim reclamar oferta");
+                
                 /* Do work. */
                 ofertaDao.update(connection, old);
 
@@ -161,20 +160,20 @@ public class OfertaServiceImpl implements OfertaService {
     @Override
     public void removeOferta(Long ofertaId) throws InstanceNotFoundException, InputValidationException, OfertaEstadoException {
     	
-    	Oferta old = findOferta(ofertaId);
-        if (old.getEstado() != Oferta.ESTADO_CREADA && old.getEstado() != Oferta.ESTADO_LIBERADA) {
-        	throw new OfertaEstadoException(old.getOfertaId(), old.getEstado());
-        }
-
         try (Connection connection = dataSource.getConnection()) {
-
             try {
-
                 /* Prepare connection. */
                 connection
                         .setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
                 connection.setAutoCommit(false);
 
+                /* Checks */
+            	Oferta old = findOferta(ofertaId);
+
+                if (old.getEstado() != Oferta.ESTADO_CREADA && old.getEstado() != Oferta.ESTADO_LIBERADA) {
+                	throw new OfertaEstadoException(old.getOfertaId(), old.getEstado());
+                }
+                
                 /* Do work. */
                 ofertaDao.remove(connection, ofertaId);
 
@@ -227,25 +226,8 @@ public class OfertaServiceImpl implements OfertaService {
     public Long reservarOferta(Long ofertaId, String emailUsuario, String numeroTarjeta)
             throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException {
 
-    	PropertyValidator.validateEmail(emailUsuario);
-        PropertyValidator.validateCreditCard(numeroTarjeta);
-        
-    	Oferta old = findOferta(ofertaId);
-    	Calendar now = Calendar.getInstance();
     	Long reservaId = null;
     	
-    	if (old.getMaxPersonas()==findReservas(ofertaId, null).size()) 
-        	throw new OfertaMaxPersonasException(ofertaId, old.getMaxPersonas());
-    	
-    	for (Reserva reserva : findReservas(ofertaId, null)) {
-    		if (reserva.getEmailUsuario().equals(emailUsuario))
-            	throw new OfertaEmailException(ofertaId, emailUsuario);    		
-    	}
-		
-		if (old.getIniReserva().after(now) || old.getLimReserva().before(now)) {
-        	throw new OfertaReservaDateException(ofertaId);    		
-		}	
-	        
 	        try (Connection connection = dataSource.getConnection()) {
 	
 	            try {
@@ -255,10 +237,30 @@ public class OfertaServiceImpl implements OfertaService {
 	                        .setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 	                connection.setAutoCommit(false);
 	                
+	            	PropertyValidator.validateEmail(emailUsuario);
+	                PropertyValidator.validateCreditCard(numeroTarjeta);
+	                
+	                /* Checks */
+	            	Oferta old = findOferta(ofertaId);
+
+	            	if (old.getMaxPersonas()==findReservas(ofertaId, null).size()) //FIXME
+	                	throw new OfertaMaxPersonasException(ofertaId, old.getMaxPersonas());
+	            	
+	            	for (Reserva reserva : findReservas(ofertaId, null)) { //FIXME
+	            		if (reserva.getEmailUsuario().equals(emailUsuario))
+	                    	throw new OfertaEmailException(ofertaId, emailUsuario);    		
+	            	}
+	            	
+	            	Calendar now = Calendar.getInstance();
+	        		if (old.getIniReserva().after(now) || old.getLimReserva().before(now)) {
+	                	throw new OfertaReservaDateException(ofertaId);    		
+	        		}	
+	        		
+	        		/* Check state */
 	    	        if (old.getEstado() == Oferta.ESTADO_CREADA || old.getEstado() == Oferta.ESTADO_LIBERADA) 
 	    	        	old.setEstado(Oferta.ESTADO_COMPROMETIDA);
 	    	        
-	                /* Do work. */
+	                /* Do work and update state. */
 	                ofertaDao.update(connection, old);
 	                reservaId = reservaDao.create(connection, new Reserva(ofertaId, emailUsuario,
 	                        numeroTarjeta, Reserva.ESTADO_PENDIENTE, Calendar.getInstance()));
@@ -277,7 +279,6 @@ public class OfertaServiceImpl implements OfertaService {
 	        } catch (SQLException e) {
 	            throw new RuntimeException(e);
 	        }
-		//}
 		return reservaId;
     }
 
@@ -292,12 +293,12 @@ public class OfertaServiceImpl implements OfertaService {
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }	}
+        }
+	}
 	
     @Override
     public Reserva findReserva(Long reservaId) 
     		throws InstanceNotFoundException {
-
         try (Connection connection = dataSource.getConnection()) {
 
             Reserva reserva = reservaDao.find(connection, reservaId);
@@ -313,34 +314,33 @@ public class OfertaServiceImpl implements OfertaService {
 	@Override
 	public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException {
 		
-		Reserva reserva = findReserva(reservaId);
-		
-		if (reserva.getEstado() == Reserva.ESTADO_CERRADA)
-			return false;
-		
-		Oferta oferta = findOferta(reserva.getOfertaId());
-		Calendar now = Calendar.getInstance();
-		if (oferta.getLimOferta().before(now)) {
-        	throw new OfertaReclamaDateException(oferta.getOfertaId());    		
-		}	
-		
         try (Connection connection = dataSource.getConnection()) {
-
             try {
-
                 /* Prepare connection. */
                 connection
                         .setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
                 connection.setAutoCommit(false);
 
-                /* Do work. */
+                /* Checks */
+        		Reserva reserva = findReserva(reservaId);
+        		
+        		if (reserva.getEstado() == Reserva.ESTADO_CERRADA)
+        			return false;
+        		
+        		Oferta oferta = findOferta(reserva.getOfertaId());
+        		Calendar now = Calendar.getInstance();
+        		if (oferta.getLimOferta().before(now)) {
+                	throw new OfertaReclamaDateException(oferta.getOfertaId());    		
+        		}	
+        		
+                /* Do work and update state. */
         		reserva.setEstado(Reserva.ESTADO_CERRADA);
         		reservaDao.update(connection, reserva);
         		
         		// Si todas las reservas se han disfrutado ==> Estado de la oferta liberada!
-        		if (findReservas(oferta.getOfertaId(), 
+        		if (findReservas(oferta.getOfertaId(), //FIXME
         				Reserva.ESTADO_PENDIENTE).size() == 1) //1 porque aun no hicimos commit del estado de esta reserva
-        			oferta.setEstado(Oferta.ESTADO_LIBERADA);
+        			oferta.setEstado(Oferta.ESTADO_LIBERADA); 
         		
         		ofertaDao.update(connection, oferta);
         		

@@ -1,10 +1,7 @@
 package es.udc.ws.app.client.service.soap;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.ws.BindingProvider;
 
 import es.udc.ws.app.client.service.ClientOfertaService;
@@ -120,11 +117,10 @@ public class SoapClientOfertaService implements ClientOfertaService {
 	}
 
     @Override
-    public List<OfertaDto> findOfertas(String keywords, Calendar fecha) {
-        GregorianCalendar c1 = new GregorianCalendar();
+    public List<OfertaDto> findOfertas(String keywords) {
         try {
 			return OfertaDtoToSoapOfertaDtoConversor.toOfertaDtos(
-			            ofertasProvider.findOfertas(keywords, DatatypeFactory.newInstance().newXMLGregorianCalendar(c1)));
+			            ofertasProvider.findOfertas(keywords));//, DatatypeFactory.newInstance().newXMLGregorianCalendar(c1)));
 		} catch(Exception ex) {
             throw new RuntimeException(ex);
         }

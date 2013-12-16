@@ -1,6 +1,5 @@
 package es.udc.ws.app.client.service;
 
-import java.util.Calendar;
 import java.util.List;
 
 import es.udc.ws.app.dto.OfertaDto;
@@ -25,7 +24,7 @@ public interface ClientOfertaService {
     
     public OfertaDto findOferta(Long ofertaId) throws InstanceNotFoundException;
 
-    public List<OfertaDto> findOfertas(String keywords, Calendar fecha);
+    public List<OfertaDto> findOfertas(String keywords);
 
     //public List<OfertaDto> findOfertas();
     

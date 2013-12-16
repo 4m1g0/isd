@@ -34,7 +34,7 @@ public class MockClientOfertaService implements ClientOfertaService {
 	}
 	
     @Override
-    public List<OfertaDto> findOfertas(String keywords, Calendar fecha) {
+    public List<OfertaDto> findOfertas(String keywords) {
 
         List<OfertaDto> ofertas = new ArrayList<>();
 
