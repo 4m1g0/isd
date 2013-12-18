@@ -2,6 +2,8 @@ package es.udc.ws.app.xml;
 
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
+import es.udc.ws.app.dto.ReservaDto.Estado;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ public class XmlReservaDtoConversor {
         }
         
         Element estadoElement = new Element("estado", XML_NS);
-        estadoElement.setText(Integer.toString(reserva.getEstado()));
+        estadoElement.setText(reserva.getEstado().name());
         reservaElement.addContent(estadoElement);
         
         if (reserva.getFechaReserva() != null) {
@@ -91,7 +93,7 @@ public class XmlReservaDtoConversor {
             ofertaId = Long.valueOf(ofertaIdElement.getTextTrim());
         }
 
-        short estado = Short.valueOf(reservaElement.getChildTextTrim("estado", XML_NS));
+        Estado estado = Estado.valueOf(reservaElement.getChildTextTrim("estado", XML_NS));
         
         Calendar fechaReserva = getFecha(reservaElement.getChild(
                 "fechaReserva", XML_NS));

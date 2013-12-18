@@ -22,6 +22,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import es.udc.ws.app.client.service.ClientOfertaService;
+import es.udc.ws.app.client.service.soap.wsdl.Estado;
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
 import es.udc.ws.app.exceptions.OfertaEmailException;
@@ -242,9 +243,9 @@ public class RestClientOfertaService implements ClientOfertaService {
 
 
 	@Override
-	public List<ReservaDto> findReservas(Long ofertaId, Short estado) {
+	public List<ReservaDto> findReservas(Long ofertaId, Estado estado) {
 	    GetMethod method = null;
-	    method = new GetMethod(getEndpointAddress() + "reservas/" + ofertaId + "&estado=" + estado);
+	    method = new GetMethod(getEndpointAddress() + "reservas/" + ofertaId + "&estado=" + estado); //TODO en ReservasServlet
 	    try {
 	        HttpClient client = new HttpClient();
 	        int statusCode;
@@ -273,7 +274,7 @@ public class RestClientOfertaService implements ClientOfertaService {
 	@Override
 	public ReservaDto findReserva(Long reservaId) {
 	    GetMethod method = null;
-	    method = new GetMethod(getEndpointAddress() + "reservas/");
+	    method = new GetMethod(getEndpointAddress() + "reservas/" + reservaId);
 	    try {
 	        HttpClient client = new HttpClient();
 	        int statusCode;
@@ -301,7 +302,7 @@ public class RestClientOfertaService implements ClientOfertaService {
 	@Override
 	public boolean reclamarOferta(Long reservaId)
         throws InstanceNotFoundException {
-	    PostMethod method = new PostMethod(getEndpointAddress() + "reservas");
+	    PostMethod method = new PostMethod(getEndpointAddress() + "reservas/" + reservaId + "R"); //TODO en ReservasServlet
 	    try {
 	        method.addParameter("reservaId", Long.toString(reservaId));
 	

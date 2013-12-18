@@ -25,7 +25,7 @@ public class Jdbc3CcSqlReservaDao extends AbstractSqlReservaDao {
             preparedStatement.setLong(i++, reserva.getOfertaId());
             preparedStatement.setString(i++, reserva.getEmailUsuario());
             preparedStatement.setString(i++, reserva.getNumeroTarjeta());
-            preparedStatement.setShort(i++, reserva.getEstado());
+            preparedStatement.setString(i++, reserva.getEstado().name());
             Timestamp fechaReserva = new Timestamp(reserva.getFechaReserva().getTime()
                     .getTime());
             preparedStatement.setTimestamp(i++, fechaReserva);
@@ -42,10 +42,6 @@ public class Jdbc3CcSqlReservaDao extends AbstractSqlReservaDao {
             }
             
         return resultSet.getLong(1);
-
-            /* Return reserva. *//*
-            return new Reserva(reservaId, reserva.getOfertaId(), reserva.getEmailUsuario(),
-                    reserva.getNumeroTarjeta(), reserva.getEstado(), reserva.getFechaReserva());*/
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

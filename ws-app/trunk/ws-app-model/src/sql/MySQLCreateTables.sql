@@ -21,16 +21,17 @@ DROP TABLE Oferta;
 -- --------------------------------- Oferta ------------------------------------
 CREATE TABLE Oferta ( ofertaId BIGINT NOT NULL AUTO_INCREMENT,
     titulo VARCHAR(255) COLLATE latin1_bin NOT NULL,
-    estado SMALLINT NOT NULL,
     descripcion VARCHAR(1024) COLLATE latin1_bin NOT NULL,
     iniReserva TIMESTAMP DEFAULT 0 NOT NULL,
     limReserva TIMESTAMP DEFAULT 0 NOT NULL,
     limOferta TIMESTAMP DEFAULT 0 NOT NULL,
     precioReal FLOAT NOT NULL,
     precioRebajado FLOAT NOT NULL,
-    maxPersonas SMALLINT,
-    CONSTRAINT OfertaPK PRIMARY KEY(ofertaId), 
-    CONSTRAINT validState CHECK ( estado >= 0 AND estado <= 2) ) ENGINE = InnoDB;
+	maxPersonas BIGINT,
+    estado VARCHAR(15) COLLATE latin1_bin NOT NULL,
+    numReservas BIGINT NOT NULL,
+    numUsedReservas BIGINT NOT NULL,
+    CONSTRAINT OfertaPK PRIMARY KEY(ofertaId) ) ENGINE = InnoDB;
 
 CREATE INDEX OfertaIndexByOfertaId ON Oferta (ofertaId);
 CREATE INDEX OfertaIndexByTitle ON Oferta (titulo);
@@ -41,10 +42,9 @@ CREATE TABLE Reserva ( reservaId BIGINT NOT NULL AUTO_INCREMENT,
     ofertaId BIGINT NOT NULL,
     emailUsuario VARCHAR(40) COLLATE latin1_bin NOT NULL,
     numeroTarjeta VARCHAR(16),
-    estado SMALLINT NOT NULL,
+    estado VARCHAR(15) COLLATE latin1_bin NOT NULL,
     fechaReserva TIMESTAMP DEFAULT 0 NOT NULL,
     CONSTRAINT ReservaPK PRIMARY KEY(ReservaId),
-    CONSTRAINT validState CHECK ( estado >= 0 AND estado <= 1),
     CONSTRAINT ReservaOfertaIdFK FOREIGN KEY(ofertaId)
         REFERENCES Oferta(ofertaId) ON DELETE CASCADE ) ENGINE = InnoDB;
 

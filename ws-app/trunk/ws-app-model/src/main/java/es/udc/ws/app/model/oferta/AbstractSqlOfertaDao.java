@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import es.udc.ws.app.model.oferta.Oferta.Estado;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
 /**
@@ -26,7 +27,7 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
             throws InstanceNotFoundException {
 
         /* Create "queryString". */
-        String queryString = "SELECT titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado FROM Oferta WHERE ofertaId = ?";
+        String queryString = "SELECT titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado, numReservas, numUsedReservas FROM Oferta WHERE ofertaId = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)) {
 
@@ -54,11 +55,15 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
             limOferta.setTime(resultSet.getTimestamp(i++));
             float precioReal = resultSet.getFloat(i++);
             float precioRebajado = resultSet.getFloat(i++);
-            short maxPersonas = resultSet.getShort(i++);
-            short estado = resultSet.getShort(i++);
+            Long maxPersonas = resultSet.getLong(i++);
+            if (maxPersonas == 0) //resultSet.getLong devuelve un 0 si hay un null en la base de datos
+            	maxPersonas = Long.MAX_VALUE;
+            Estado estado = Estado.valueOf(resultSet.getString(i++));
+            Long numReservas = resultSet.getLong(i++);
+            Long numUsedReservas = resultSet.getLong(i++);
 
             /* Return oferta. */
-            return new Oferta(ofertaId, titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado);
+            return new Oferta(ofertaId, titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado, numReservas, numUsedReservas);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -67,12 +72,12 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
     }
 
     @Override
-    public List<Oferta> findByKeywords(Connection connection, String keywords, Short estadoRequerido, Calendar fecha) {
+    public List<Oferta> findByKeywords(Connection connection, String keywords, Estado estadoRequerido, Calendar fecha) {
 
     	boolean and = false;
         /* Create "queryString". */
         String[] words = keywords != null ? keywords.split(" ") : null;
-        String queryString = "SELECT ofertaId, titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado FROM Oferta";
+        String queryString = "SELECT ofertaId, titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado, numReservas, numUsedReservas FROM Oferta";
         if (words != null && words.length > 0) {
             queryString += " WHERE";
             and = true;
@@ -109,7 +114,7 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
                 }
             }
             if (estadoRequerido != null) {
-            	preparedStatement.setShort(++i, estadoRequerido);
+            	preparedStatement.setString(++i, estadoRequerido.name());
             }
             if (fecha != null) {
             	preparedStatement.setTimestamp(++i, new Timestamp(fecha.getTime().getTime()));
@@ -135,11 +140,14 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
                 limOferta.setTime(resultSet.getTimestamp(i++));
                 float precioReal = resultSet.getFloat(i++);
                 float precioRebajado = resultSet.getFloat(i++);
-                short maxPersonas = resultSet.getShort(i++);
-                short estado = resultSet.getShort(i++);
+                Long maxPersonas = resultSet.getLong(i++);
+                if (maxPersonas == 0) //resultSet.getLong devuelve un 0 si hay un null en la base de datos
+                	maxPersonas = Long.MAX_VALUE;
+                Estado estado = Estado.valueOf(resultSet.getString(i++));
+                Long numReservas = resultSet.getLong(i++);
+                Long numUsedReservas = resultSet.getLong(i++);
 
-                ofertas.add(new Oferta(ofertaId, titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado));
-
+                ofertas.add(new Oferta(ofertaId, titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado, numReservas, numUsedReservas));
             }
 
             /* Return ofertas. */
@@ -157,7 +165,7 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
 
         /* Create "queryString". */
         String queryString = "UPDATE Oferta"
-                + " SET titulo = ?, descripcion = ?, precioReal = ?, precioRebajado = ?, maxPersonas = ?, estado = ? WHERE ofertaId = ?";
+                + " SET titulo = ?, descripcion = ?, precioReal = ?, precioRebajado = ?, maxPersonas = ?, estado = ?, numReservas = ?, numUsedReservas = ? WHERE ofertaId = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)) {
 
@@ -167,8 +175,13 @@ public abstract class AbstractSqlOfertaDao implements SqlOfertaDao {
             preparedStatement.setString(i++, oferta.getDescripcion());
             preparedStatement.setFloat(i++, oferta.getPrecioReal());
             preparedStatement.setFloat(i++, oferta.getPrecioRebajado());
-            preparedStatement.setShort(i++, oferta.getMaxPersonas());
-            preparedStatement.setShort(i++, oferta.getEstado());
+            if (oferta.getMaxPersonas() == Long.MAX_VALUE)
+                preparedStatement.setObject(i++, null);
+            else
+            	preparedStatement.setLong(i++, oferta.getMaxPersonas());
+            preparedStatement.setString(i++, oferta.getEstado().name());
+            preparedStatement.setLong(i++, oferta.getNumReservas());
+            preparedStatement.setLong(i++, oferta.getNumUsedReservas());
             preparedStatement.setLong(i++, oferta.getOfertaId());
 
             /* Execute query. */

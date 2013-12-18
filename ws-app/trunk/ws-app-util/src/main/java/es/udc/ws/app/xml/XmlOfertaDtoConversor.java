@@ -104,19 +104,19 @@ public class XmlOfertaDtoConversor {
 
         if (oferta.getIniReserva() != null) {
             Element iniReservaElement = getFecha(oferta
-                    .getIniReserva());
+                    .getIniReserva(), "iniReserva");
             ofertaElement.addContent(iniReservaElement);
         }
         
         if (oferta.getLimReserva() != null) {
             Element limReservaElement = getFecha(oferta
-                    .getLimReserva());
+                    .getLimReserva(), "limReserva");
             ofertaElement.addContent(limReservaElement);
         }
         
         if (oferta.getLimOferta() != null) {
             Element limOfertaElement = getFecha(oferta
-                    .getLimOferta());
+                    .getLimOferta(), "limOferta");
             ofertaElement.addContent(limOfertaElement);
         }
         
@@ -129,7 +129,7 @@ public class XmlOfertaDtoConversor {
         ofertaElement.addContent(precioRebajadoElement);
 
         Element maxPersonasElement = new Element("maxPersonas", XML_NS);
-        maxPersonasElement.setText(Integer.toString(oferta.getMaxPersonas()));
+        maxPersonasElement.setText(Long.toString(oferta.getMaxPersonas()));
         ofertaElement.addContent(maxPersonasElement);
 
 
@@ -155,9 +155,9 @@ public class XmlOfertaDtoConversor {
 
     }
 
-    private static Element getFecha(Calendar fecha) {
+    private static Element getFecha(Calendar fecha, String name) {
 
-        Element releaseDateElement = new Element("fecha", XML_NS);
+        Element releaseDateElement = new Element(name, XML_NS);
         int day = fecha.get(Calendar.DAY_OF_MONTH);
         int month = fecha.get(Calendar.MONTH) - Calendar.JANUARY + 1;
         int year = fecha.get(Calendar.YEAR);
@@ -204,7 +204,7 @@ public class XmlOfertaDtoConversor {
         float precioRebajado = Float.valueOf(
                 ofertaElement.getChildTextTrim("precioRebajado", XML_NS));
         
-        short maxPersonas = Short.valueOf(
+        Long maxPersonas = Long.valueOf(
                 ofertaElement.getChildTextTrim("maxPersonas", XML_NS));
 
         /*short estado = Short.valueOf(

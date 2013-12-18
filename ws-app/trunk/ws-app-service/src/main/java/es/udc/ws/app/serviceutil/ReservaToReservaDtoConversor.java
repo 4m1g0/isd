@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.udc.ws.app.dto.ReservaDto;
+import es.udc.ws.app.dto.ReservaDto.Estado;
 import es.udc.ws.app.model.reserva.Reserva;
 
 public class ReservaToReservaDtoConversor {
@@ -18,8 +19,10 @@ public class ReservaToReservaDtoConversor {
     }
     
     public static ReservaDto toReservaDto(Reserva reserva) {
-        return new ReservaDto(reserva.getReservaId(), reserva.getOfertaId(), reserva
-                .getEstado(), reserva.getFechaReserva());
+    	if (reserva.getEstado() != null)
+    		return new ReservaDto(reserva.getReservaId(), reserva.getOfertaId(), Estado.valueOf(reserva //parseamos por enum diferentes
+                .getEstado().name()), reserva.getFechaReserva());
+    	return new ReservaDto(reserva.getReservaId(), reserva.getOfertaId(), null, reserva.getFechaReserva());
     }
     
 }

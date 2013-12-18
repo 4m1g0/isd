@@ -23,10 +23,11 @@ public class OfertaToOfertaDtoConversor {
         		oferta.getPrecioRebajado(), oferta.getMaxPersonas());
     }
 
+    // ==> Este método solo se llama al añadir una nueva oferta ==>
     public static Oferta toOferta(OfertaDto oferta) {
         return new Oferta(oferta.getOfertaId(), oferta.getTitulo(), oferta.getDescripcion(), oferta.getIniReserva(), 
         		oferta.getLimReserva(), oferta.getLimOferta(), oferta.getPrecioReal(), 
-        		oferta.getPrecioRebajado(), oferta.getMaxPersonas(), Oferta.ESTADO_CREADA); //Solo se llama al crear una oferta
+        		oferta.getPrecioRebajado(), oferta.getMaxPersonas(), Oferta.Estado.CREADA, 0L, 0L); 
     }    
     
 }

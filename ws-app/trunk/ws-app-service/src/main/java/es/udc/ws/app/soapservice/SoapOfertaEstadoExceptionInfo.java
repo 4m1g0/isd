@@ -4,13 +4,13 @@ package es.udc.ws.app.soapservice;
 public class SoapOfertaEstadoExceptionInfo {
 
     private Long ofertaId;
-    private short estado;
+    private String estado;
 
     public SoapOfertaEstadoExceptionInfo() {
     }
 
     public SoapOfertaEstadoExceptionInfo(Long ofertaId, 
-                                           short estado) {
+                                           String estado) {
         this.ofertaId = ofertaId;
         this.estado = estado;
     }
@@ -19,11 +19,11 @@ public class SoapOfertaEstadoExceptionInfo {
         return ofertaId;
     }
 
-    public short getEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(short estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 

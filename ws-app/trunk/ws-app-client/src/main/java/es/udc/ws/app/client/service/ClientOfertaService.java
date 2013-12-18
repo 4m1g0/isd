@@ -2,6 +2,7 @@ package es.udc.ws.app.client.service;
 
 import java.util.List;
 
+import es.udc.ws.app.client.service.soap.wsdl.Estado;
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
 import es.udc.ws.app.exceptions.OfertaEmailException;
@@ -31,7 +32,7 @@ public interface ClientOfertaService {
     public Long reservarOferta(Long ofertaId, String emailUsuario, String numeroTarjeta)
             throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException;
 
-    public List<ReservaDto> findReservas(Long ofertaId, Short estado) throws InstanceNotFoundException;
+    public List<ReservaDto> findReservas(Long ofertaId, Estado estado) throws InstanceNotFoundException;
 
     public ReservaDto findReserva(Long reservaId) throws InstanceNotFoundException;
 

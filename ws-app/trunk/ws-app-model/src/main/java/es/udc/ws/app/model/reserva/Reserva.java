@@ -8,12 +8,12 @@ public class Reserva {
     private Long ofertaId;
     private String emailUsuario;
     private String numeroTarjeta;
-    private Short estado;
-    public final static short ESTADO_PENDIENTE = 0;
-    public final static short ESTADO_CERRADA = 1;
     private Calendar fechaReserva;
 
-    public Reserva(Long ofertaId, String emailUsuario, String numeroTarjeta, Short estado, Calendar fechaReserva) 
+	public enum Estado{PENDIENTE, CERRADA};
+	private Estado estado;
+
+    public Reserva(Long ofertaId, String emailUsuario, String numeroTarjeta, Estado estado, Calendar fechaReserva) 
     {
         this.ofertaId = ofertaId;
         this.emailUsuario = emailUsuario;
@@ -26,7 +26,7 @@ public class Reserva {
     }
 
     public Reserva(Long reservaId, Long ofertaId, String emailUsuario,
-    		String numeroTarjeta, Short estado, Calendar fechaReserva) {
+    		String numeroTarjeta, Estado estado, Calendar fechaReserva) {
         this(ofertaId, emailUsuario, numeroTarjeta, estado, fechaReserva);
         this.reservaId = reservaId;
     }
@@ -74,11 +74,11 @@ public class Reserva {
         this.emailUsuario = emailUsuario;
     }
     
-    public Short getEstado() {
+    public Estado getEstado() {
 		return estado;
 	}
 
-	public void setEstado(Short estado) {
+	public void setEstado(Estado estado) {
 		this.estado = estado;
 	}
 
@@ -95,7 +95,7 @@ public class Reserva {
         result = prime * result
                 + ((emailUsuario == null) ? 0 : emailUsuario.hashCode());
         result = prime * result + ((reservaId == null) ? 0 : reservaId.hashCode());
-        result = prime * result + estado;
+        result = prime * result + estado.hashCode();
         return result;
     }
 

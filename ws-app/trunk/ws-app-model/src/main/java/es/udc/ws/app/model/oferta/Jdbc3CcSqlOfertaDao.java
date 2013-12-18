@@ -14,8 +14,8 @@ public class Jdbc3CcSqlOfertaDao extends AbstractSqlOfertaDao {
 
         /* Create "queryString". */
         String queryString = "INSERT INTO Oferta"
-                + " (titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado)"
-                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + " (titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado, numReservas, numUsedReservas)"
+                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                         queryString, Statement.RETURN_GENERATED_KEYS)) {
@@ -35,8 +35,13 @@ public class Jdbc3CcSqlOfertaDao extends AbstractSqlOfertaDao {
             preparedStatement.setTimestamp(i++, date3);
             preparedStatement.setFloat(i++, oferta.getPrecioReal());
             preparedStatement.setFloat(i++, oferta.getPrecioRebajado());
-            preparedStatement.setShort(i++, oferta.getMaxPersonas());
-            preparedStatement.setShort(i++,  oferta.getEstado());
+            if (oferta.getMaxPersonas() == Long.MAX_VALUE)
+                preparedStatement.setObject(i++, null);
+            else
+            	preparedStatement.setLong(i++, oferta.getMaxPersonas());
+            preparedStatement.setString(i++, oferta.getEstado().name());
+            preparedStatement.setLong(i++, oferta.getNumReservas());
+            preparedStatement.setLong(i++, oferta.getNumUsedReservas());
             
             /* Execute query. */
             preparedStatement.executeUpdate();
@@ -53,7 +58,7 @@ public class Jdbc3CcSqlOfertaDao extends AbstractSqlOfertaDao {
             /* Return movie. */
             return new Oferta(ofertaId, oferta.getTitulo(), oferta.getDescripcion(),
                     oferta.getIniReserva(), oferta.getLimReserva(), oferta.getLimOferta(), oferta.getPrecioReal(), 
-                    oferta.getPrecioRebajado(), oferta.getMaxPersonas(), oferta.getEstado());
+                    oferta.getPrecioRebajado(), oferta.getMaxPersonas(), oferta.getEstado(), oferta.getNumReservas(), oferta.getNumUsedReservas());
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

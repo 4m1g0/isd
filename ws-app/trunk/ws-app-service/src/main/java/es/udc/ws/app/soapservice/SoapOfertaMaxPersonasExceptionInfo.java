@@ -4,13 +4,13 @@ package es.udc.ws.app.soapservice;
 public class SoapOfertaMaxPersonasExceptionInfo {
 
     private Long ofertaId;
-    private short maxPersonas;
+    private Long maxPersonas;
 
     public SoapOfertaMaxPersonasExceptionInfo() {
     }
 
     public SoapOfertaMaxPersonasExceptionInfo(Long ofertaId, 
-                                           short maxPersonas) {
+                                           Long maxPersonas) {
         this.ofertaId = ofertaId;
         this.maxPersonas = maxPersonas;
     }
@@ -19,11 +19,11 @@ public class SoapOfertaMaxPersonasExceptionInfo {
         return ofertaId;
     }
 
-    public short getMaxPersonas() {
+    public Long getMaxPersonas() {
         return maxPersonas;
     }
 
-    public void setMaxPersonas(short maxPersonas) {
+    public void setMaxPersonas(Long maxPersonas) {
         this.maxPersonas = maxPersonas;
     }
 

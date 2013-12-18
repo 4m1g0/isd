@@ -122,7 +122,7 @@ public class OfertasServlet extends HttpServlet{
         } catch (OfertaEstadoException e) {
             ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_GONE, 
                     XmlExceptionConversor.toOfertaEstadoException(
-                    new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado())),
+                    new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado().name())),
                     null);
             return;
 		}
@@ -175,7 +175,7 @@ public class OfertasServlet extends HttpServlet{
 		} catch (OfertaEstadoException e) {
             ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_GONE, 
                     XmlExceptionConversor.toOfertaEstadoException(
-                    new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado())),
+                    new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado().name())),
                     null);
             return;
 		}

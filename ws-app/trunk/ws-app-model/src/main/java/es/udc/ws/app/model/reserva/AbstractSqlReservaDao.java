@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import es.udc.ws.app.model.reserva.Reserva.Estado;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
 public abstract class AbstractSqlReservaDao implements SqlReservaDao {
@@ -42,7 +43,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
             Long ofertaId = resultSet.getLong(i++);
             String emailUsuario = resultSet.getString(i++);
             String numeroTarjeta = resultSet.getString(i++);
-            short estado = resultSet.getShort(i++);
+            Estado estado = Estado.valueOf(resultSet.getString(i++));
             Calendar fechaReserva = Calendar.getInstance();
             fechaReserva.setTime(resultSet.getTimestamp(i++));
 
@@ -57,7 +58,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
     }
 
 	@Override
-	public List<Reserva> findReservas(Connection connection, Long ofertaId, Short estado)
+	public List<Reserva> findReservas(Connection connection, Long ofertaId, Estado estado)
 			throws InstanceNotFoundException {
 		
         /* Create "queryString". */
@@ -71,7 +72,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
             int i = 1;
             preparedStatement.setLong(i++, ofertaId.longValue());
             if (estado != null)
-                preparedStatement.setShort(i++, estado);
+                preparedStatement.setString(i++, estado.name());
 
             /* Execute query. */
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -84,7 +85,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
 	            Long reservaId = resultSet.getLong(i++);
 	            String emailUsuario = resultSet.getString(i++);
 	            String numeroTarjeta = resultSet.getString(i++);
-	            short _estado = resultSet.getShort(i++);
+	            Estado _estado = Estado.valueOf(resultSet.getString(i++));
 	            Calendar fechaReserva = Calendar.getInstance();
 	            fechaReserva.setTime(resultSet.getTimestamp(i++));
 
@@ -116,7 +117,7 @@ public abstract class AbstractSqlReservaDao implements SqlReservaDao {
             preparedStatement.setLong(i++, reserva.getOfertaId());
             preparedStatement.setString(i++, reserva.getEmailUsuario());
             preparedStatement.setString(i++, reserva.getNumeroTarjeta());
-            preparedStatement.setShort(i++, reserva.getEstado());
+            preparedStatement.setString(i++, reserva.getEstado().name());
             Timestamp date = reserva.getFechaReserva() != null ? new Timestamp(
                     reserva.getFechaReserva().getTime().getTime()) : null;
             preparedStatement.setTimestamp(i++, date);

@@ -24,7 +24,7 @@
         <!-- Data source properties -->
         <dataSource.user>ws</dataSource.user>
         <dataSource.password>ws</dataSource.password>
-        <dataSource.jndiName>jdbc/ws-app-ds</dataSource.jndiName>
+        <dataSource.jndiName>jdbc/ws-javaexamples-ds</dataSource.jndiName>
         <testDataSource.user>${dataSource.user}</testDataSource.user>
         <testDataSource.password>${dataSource.password}</testDataSource.password>
 

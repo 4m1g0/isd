@@ -3,6 +3,7 @@ package es.udc.ws.app.model.reserva;
 import java.sql.Connection;
 import java.util.List;
 
+import es.udc.ws.app.model.reserva.Reserva.Estado;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
 public interface SqlReservaDao {
@@ -12,7 +13,7 @@ public interface SqlReservaDao {
     public Reserva find(Connection connection, Long reservaId)
             throws InstanceNotFoundException;
 
-    public List<Reserva> findReservas(Connection connection, Long ofertaId, Short estado)
+    public List<Reserva> findReservas(Connection connection, Long ofertaId, Estado estado)
             throws InstanceNotFoundException;
     
     public void update(Connection connection, Reserva reserva)

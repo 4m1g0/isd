@@ -14,12 +14,12 @@ public class OfertaDto {
     private Calendar limOferta;
     private float precioReal;
     private float precioRebajado;
-    private Short maxPersonas;
+    private Long maxPersonas;
 
     public OfertaDto() {
     }    
     
-    public OfertaDto(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas) {
+    public OfertaDto(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, Long maxPersonas) {
 
         this.ofertaId = ofertaId;
         this.titulo = titulo;
@@ -114,13 +114,13 @@ public class OfertaDto {
         }
     }
 
-    public Short getMaxPersonas() {
+    public Long getMaxPersonas() {
 		return maxPersonas;
 	}
 
-	public void setMaxPersonas(Short maxPersonas) {
+	public void setMaxPersonas(Long maxPersonas) {
         if (maxPersonas == null)
-            this.maxPersonas = Short.MAX_VALUE;
+            this.maxPersonas = Long.MAX_VALUE;
         else
         	this.maxPersonas = maxPersonas;
 	}

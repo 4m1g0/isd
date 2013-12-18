@@ -12,13 +12,17 @@ public class Oferta {
     private Calendar limOferta;
     private float precioReal;
     private float precioRebajado;
-    private Short maxPersonas;
-    private Short estado;
-    public final static short ESTADO_CREADA = 0;
-	public final static short ESTADO_COMPROMETIDA = 1;
-	public final static short ESTADO_LIBERADA = 2;
+    private Long maxPersonas;
+	
+	public enum Estado{CREADA, COMPROMETIDA, LIBERADA};
+	private Estado estado;
+	
+	//Atributos para mejorar el rendimiento
+	private Long numReservas;
+	private Long numUsedReservas;	
+
     
-    public Oferta(String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas, short estado) 
+    public Oferta(String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, Long maxPersonas, Estado estado, Long numReservas, Long numUsedReservas) 
     {
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -36,13 +40,18 @@ public class Oferta {
         }
         this.precioReal = precioReal;
         this.precioRebajado = precioRebajado;
-        this.maxPersonas = maxPersonas;
+        if (maxPersonas == null)
+            this.maxPersonas = Long.MAX_VALUE;
+        else
+        	this.maxPersonas = maxPersonas;
         this.estado = estado;
+        this.numReservas = numReservas;
+        this.numUsedReservas = numUsedReservas;
     }
     
-	public Oferta(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, short maxPersonas, short estado) 
+	public Oferta(Long ofertaId, String titulo, String descripcion, Calendar iniReserva, Calendar limReserva, Calendar limOferta, float precioReal, float precioRebajado, Long maxPersonas, Estado estado, Long numReservas, Long numUsedReservas) 
     {
-        this(titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado);
+        this(titulo, descripcion, iniReserva, limReserva, limOferta, precioReal, precioRebajado, maxPersonas, estado, numReservas, numUsedReservas);
         this.ofertaId = ofertaId;
     }
 
@@ -119,26 +128,41 @@ public class Oferta {
         }
     }
 
-    public Short getMaxPersonas() {
+    public Long getMaxPersonas() {
 		return maxPersonas;
 	}
 
-	public void setMaxPersonas(Short maxPersonas) {
+	public void setMaxPersonas(Long maxPersonas) {
         if (maxPersonas == null)
-            this.maxPersonas = Short.MAX_VALUE;
+            this.maxPersonas = Long.MAX_VALUE;
         else
         	this.maxPersonas = maxPersonas;
 	}
 
-	public Short getEstado() {
+	public Estado getEstado() {
 		return estado;
 	}
 
-	public void setEstado(Short estado) {
+	public void setEstado(Estado estado) {
 		this.estado = estado;
 	}
-
 	
+	public Long getNumReservas() {
+		return numReservas;
+	}
+
+	public void setNumReservas(Long numReservas) {
+		this.numReservas = numReservas;
+	}
+
+	public Long getNumUsedReservas() {
+		return numUsedReservas;
+	}
+
+	public void setNumUsedReservas(Long numUsedReservas) {
+		this.numUsedReservas = numUsedReservas;
+	}
+
 	@Override
     public int hashCode() {
         final int prime = 31;
@@ -153,9 +177,12 @@ public class Oferta {
                 + ((descripcion == null) ? 0 : descripcion.hashCode());
         result = prime * result + ((ofertaId == null) ? 0 : ofertaId.hashCode());
         result = prime * result + Float.floatToIntBits(precioReal);
-        result = prime * result + maxPersonas;
-        result = prime * result + estado;
+        result = prime * result + ((maxPersonas == null) ? 0 : maxPersonas.hashCode());
+        result = prime * result + estado.hashCode();
         result = prime * result + ((titulo == null) ? 0 : titulo.hashCode());
+        result = prime * result + ((numReservas == null) ? 0 : numReservas.hashCode());
+        result = prime * result + ((numUsedReservas == null) ? 0 : numUsedReservas.hashCode());
+
         return result;
     }
 
@@ -227,6 +254,20 @@ public class Oferta {
                 return false;
             }
         } else if (!titulo.equals(other.titulo)) {
+            return false;
+        }
+        if (numReservas == null) {
+            if (other.numReservas != null) {
+                return false;
+            }
+        } else if (!numReservas.equals(other.numReservas)) {
+            return false;
+        }
+        if (numUsedReservas == null) {
+            if (other.numUsedReservas != null) {
+                return false;
+            }
+        } else if (!numUsedReservas.equals(other.numUsedReservas)) {
             return false;
         }
         return true;

@@ -2,12 +2,12 @@ package es.udc.ws.app.soapservice;
 
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
+import es.udc.ws.app.dto.ReservaDto.Estado;
 import es.udc.ws.app.exceptions.OfertaEmailException;
 import es.udc.ws.app.exceptions.OfertaEstadoException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
-//import es.udc.ws.app.exceptions.ReservaExpirationException;
 import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.app.model.ofertaservice.OfertaServiceFactory;
 import es.udc.ws.app.model.reserva.Reserva;
@@ -154,9 +154,13 @@ public class SoapOfertaService {
         )
         public List<ReservaDto> findReservas(
                 @WebParam(name="ofertaId") Long ofertaId,
-                @WebParam(name="estado") Short estado) throws SoapInstanceNotFoundException {
+                @WebParam(name="estado") Estado estado) throws SoapInstanceNotFoundException {
     	try {
-            List<Reserva> reservas = OfertaServiceFactory.getService().findReservas(ofertaId, estado);
+    		List<Reserva> reservas = null;
+    		if (estado == null)
+                reservas = OfertaServiceFactory.getService().findReservas(ofertaId, null);
+    		else
+    			reservas = OfertaServiceFactory.getService().findReservas(ofertaId, Reserva.Estado.valueOf(estado.name()));
             return ReservaToReservaDtoConversor.toReservaDtos(reservas);
     	}
         catch (InstanceNotFoundException ex) {

@@ -67,7 +67,7 @@ public class OfertaDtoToSoapOfertaDtoConversor {
     
     public static ReservaDto toReservaDto(
             es.udc.ws.app.client.service.soap.wsdl.ReservaDto reserva) {
-        return new ReservaDto(reserva.getReservaId(), reserva.getOfertaId(), reserva.getEstado(), reserva.getFechaReserva().toGregorianCalendar());
+        return new ReservaDto(reserva.getReservaId(), reserva.getOfertaId(), ReservaDto.Estado.valueOf(reserva.getEstado().name()), reserva.getFechaReserva().toGregorianCalendar());
     }  
     
     public static List<ReservaDto> toReservaDtos(

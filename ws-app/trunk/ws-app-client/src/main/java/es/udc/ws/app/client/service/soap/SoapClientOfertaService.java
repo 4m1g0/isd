@@ -5,6 +5,7 @@ import java.util.List;
 import javax.xml.ws.BindingProvider;
 
 import es.udc.ws.app.client.service.ClientOfertaService;
+import es.udc.ws.app.client.service.soap.wsdl.Estado;
 import es.udc.ws.app.client.service.soap.wsdl.OfertasProvider;
 import es.udc.ws.app.client.service.soap.wsdl.OfertasProviderService;
 import es.udc.ws.app.client.service.soap.wsdl.SoapInputValidationException;
@@ -155,7 +156,7 @@ public class SoapClientOfertaService implements ClientOfertaService {
     }
 
 	@Override
-	public List<ReservaDto> findReservas(Long ofertaId, Short estado)
+	public List<ReservaDto> findReservas(Long ofertaId, Estado estado)
 			throws InstanceNotFoundException {
 		try {
 				return OfertaDtoToSoapOfertaDtoConversor.toReservaDtos(

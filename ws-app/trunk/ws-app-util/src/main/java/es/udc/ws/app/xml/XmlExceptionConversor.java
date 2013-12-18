@@ -78,7 +78,7 @@ public class XmlExceptionConversor {
 			    
 			    return new OfertaEstadoException(
 			            Long.parseLong(instanceId.getTextTrim()),
-			            Short.parseShort(estadoElement.getText()));
+			            (estadoElement.getText()));
 			} catch (JDOMException | IOException | NumberFormatException e) {
 			    throw new ParsingException(e);
 		} catch (Exception e) {
@@ -120,7 +120,7 @@ public class XmlExceptionConversor {
     			    
     			    return new OfertaMaxPersonasException(
     			            Long.parseLong(instanceId.getTextTrim()),
-    			            Short.parseShort(maxPersonasElement.getText()));
+    			            Long.parseLong(maxPersonasElement.getText()));
     			} catch (JDOMException | IOException | NumberFormatException e) {
     			    throw new ParsingException(e);
     		} catch (Exception e) {
@@ -245,7 +245,7 @@ public class XmlExceptionConversor {
 		
 		        Element maxPersonasElement = new
 		                Element("maxPersonas", XML_NS);
-		        maxPersonasElement.setText(Short.toString(ex.getMaxPersonas()));
+		        maxPersonasElement.setText(Long.toString(ex.getMaxPersonas()));
 		
 		        exceptionElement.addContent(maxPersonasElement);
 		    //}
@@ -270,7 +270,7 @@ public class XmlExceptionConversor {
 		
 		        Element estadoElement = new
 		                Element("estado", XML_NS);
-		        estadoElement.setText(Short.toString(ex.getEstado()));
+		        estadoElement.setText(ex.getEstado());
 		
 		        exceptionElement.addContent(estadoElement);
 		    //}

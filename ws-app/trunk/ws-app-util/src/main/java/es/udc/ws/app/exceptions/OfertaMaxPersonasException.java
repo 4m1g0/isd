@@ -4,9 +4,9 @@ package es.udc.ws.app.exceptions;
 public class OfertaMaxPersonasException extends Exception {
 
     private Long ofertaId;
-    private short maxPersonas;
+    private Long maxPersonas;
 
-    public OfertaMaxPersonasException(Long ofertaId, short maxPersonas) {
+    public OfertaMaxPersonasException(Long ofertaId, Long maxPersonas) {
         super("Oferta with id=\"" + ofertaId + 
               "\" has the (maxPersonas = \"" + 
               maxPersonas + "\") limit");
@@ -18,11 +18,11 @@ public class OfertaMaxPersonasException extends Exception {
         return ofertaId;
     }
 
-    public short getMaxPersonas() {
+    public Long getMaxPersonas() {
         return maxPersonas;
     }
 
-    public void setMaxPersonas(short maxPersonas) {
+    public void setMaxPersonas(Long maxPersonas) {
         this.maxPersonas = maxPersonas;
     }
 

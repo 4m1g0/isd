@@ -4,9 +4,9 @@ package es.udc.ws.app.exceptions;
 public class OfertaEstadoException extends Exception {
 
     private Long ofertaId;
-    private short estado;
+    private String estado;
 
-    public OfertaEstadoException(Long ofertaId, short estado) {
+    public OfertaEstadoException(Long ofertaId, String estado) {
         super("Oferta with id=\"" + ofertaId + 
               "\" has a state problem (estado = \"" + 
               estado + "\")");
@@ -18,11 +18,11 @@ public class OfertaEstadoException extends Exception {
         return ofertaId;
     }
 
-    public short getEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(short estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 

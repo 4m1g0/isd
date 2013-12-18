@@ -8,6 +8,7 @@ import java.util.List;
 
 import es.udc.ws.app.client.service.ClientOfertaService;
 import es.udc.ws.app.client.service.ClientOfertaServiceFactory;
+import es.udc.ws.app.client.service.soap.wsdl.Estado;
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
 import es.udc.ws.app.exceptions.OfertaEmailException;
@@ -41,12 +42,12 @@ public class OfertaServiceClient {
             	if (!args[8].equals("null")) {
 	                ofertaId = clientOfertaService.addOferta(new OfertaDto(null,
 	                        args[1], args[2], DateToCalendar(StringToDate(args[3])), DateToCalendar(StringToDate(args[4])), 
-	                        DateToCalendar(StringToDate(args[5])), Float.valueOf(args[6]), Float.valueOf(args[7]), Short.valueOf(args[8])));
+	                        DateToCalendar(StringToDate(args[5])), Float.valueOf(args[6]), Float.valueOf(args[7]), Long.valueOf(args[8])));
             	}
             	else {		
             		ofertaId = clientOfertaService.addOferta(new OfertaDto(null,
 	                        args[1], args[2], DateToCalendar(StringToDate(args[3])), DateToCalendar(StringToDate(args[4])), 
-	                        DateToCalendar(StringToDate(args[5])), Float.valueOf(args[6]), Float.valueOf(args[7]), Short.MAX_VALUE));
+	                        DateToCalendar(StringToDate(args[5])), Float.valueOf(args[6]), Float.valueOf(args[7]), Long.MAX_VALUE));
             	}
 
                 System.out.println("\nOferta " + ofertaId + " created sucessfully");
@@ -84,13 +85,13 @@ public class OfertaServiceClient {
            			clientOfertaService.updateOferta(new OfertaDto(
                         Long.parseLong(args[1]),
                         args[2], args[3], DateToCalendar(StringToDate(args[4])), DateToCalendar(StringToDate(args[5])), 
-                        DateToCalendar(StringToDate(args[6])), Float.valueOf(args[7]), Float.valueOf(args[8]), Short.valueOf(args[9])));
+                        DateToCalendar(StringToDate(args[6])), Float.valueOf(args[7]), Float.valueOf(args[8]), Long.valueOf(args[9])));
            		}
            		else {
            			clientOfertaService.updateOferta(new OfertaDto(
                             Long.parseLong(args[1]),
                             args[2], args[3], DateToCalendar(StringToDate(args[4])), DateToCalendar(StringToDate(args[5])), 
-                            DateToCalendar(StringToDate(args[6])), Float.valueOf(args[7]), Float.valueOf(args[8]), Short.MAX_VALUE));
+                            DateToCalendar(StringToDate(args[6])), Float.valueOf(args[7]), Float.valueOf(args[8]), Long.MAX_VALUE));
            		}
                 System.out.println("\nOferta " + args[1] + " updated sucessfully");
 
@@ -200,7 +201,7 @@ public class OfertaServiceClient {
                 ex.printStackTrace(System.err);
             }
         } else if("-frs".equalsIgnoreCase(args[0])) {
-            validateArgs(args, 3, new int[] {1, 2});
+            validateArgs(args, 3, new int[] {1});
 
             List<ReservaDto> reservas = null;
             
@@ -208,7 +209,7 @@ public class OfertaServiceClient {
 
             try {
             	if (!args[2].equals("null")) 
-            		reservas = clientOfertaService.findReservas(Long.parseLong(args[1]), Short.valueOf(args[2]));
+            		reservas = clientOfertaService.findReservas(Long.parseLong(args[1]), Estado.valueOf(args[2]));
             	
             	else
             		reservas = clientOfertaService.findReservas(Long.parseLong(args[1]), null);

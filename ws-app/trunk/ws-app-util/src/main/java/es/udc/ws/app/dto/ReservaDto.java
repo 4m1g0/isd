@@ -6,15 +6,16 @@ public class ReservaDto {
 
     private Long reservaId;
     private Long ofertaId;
-    private Short estado;
-    //public final static short ESTADO_PENDIENTE = 0;
-    //public final static short ESTADO_CERRADA = 1;
+    
+	public enum Estado{PENDIENTE, CERRADA};
+	private Estado estado;
+
     private Calendar fechaReserva;
     
     public ReservaDto() {
     }    
     
-    public ReservaDto(Long reservaId, Long ofertaId, Short estado, Calendar fechaReserva) {
+    public ReservaDto(Long reservaId, Long ofertaId, Estado estado, Calendar fechaReserva) {
     	this.reservaId = reservaId;
     	this.ofertaId = ofertaId;
         this.estado = estado;
@@ -51,11 +52,11 @@ public class ReservaDto {
         }
     }
 
-    public Short getEstado() {
+    public Estado getEstado() {
 		return estado;
 	}
 
-	public void setEstado(Short estado) {
+	public void setEstado(Estado estado) {
 		this.estado = estado;
 	}
 
