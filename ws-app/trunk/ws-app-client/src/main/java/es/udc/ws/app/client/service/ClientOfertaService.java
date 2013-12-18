@@ -37,7 +37,7 @@ public interface ClientOfertaService {
     public ReservaDto findReserva(Long reservaId) throws InstanceNotFoundException;
 
     //reclamarOferta: Si devuelve false ==> la reserva está cerrada. Si devuelve true ==> la reserva está abierta.
-    public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException, OfertaReservaDateException;
+    public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException;
     
 
 }

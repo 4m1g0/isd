@@ -245,7 +245,11 @@ public class RestClientOfertaService implements ClientOfertaService {
 	@Override
 	public List<ReservaDto> findReservas(Long ofertaId, Estado estado) {
 	    GetMethod method = null;
-	    method = new GetMethod(getEndpointAddress() + "reservas/" + ofertaId + "&estado=" + estado); //TODO en ReservasServlet
+	    if (estado != null)
+	    	method = new GetMethod(getEndpointAddress() + "reservas/" + ofertaId + "&estado=" + estado.ordinal());
+	    else
+	    	method = new GetMethod(getEndpointAddress() + "reservas/" + ofertaId + "&estado=");
+
 	    try {
 	        HttpClient client = new HttpClient();
 	        int statusCode;
@@ -302,7 +306,7 @@ public class RestClientOfertaService implements ClientOfertaService {
 	@Override
 	public boolean reclamarOferta(Long reservaId)
         throws InstanceNotFoundException {
-	    PostMethod method = new PostMethod(getEndpointAddress() + "reservas/" + reservaId + "R"); //TODO en ReservasServlet
+	    PostMethod method = new PostMethod(getEndpointAddress() + "reservas/" + reservaId);
 	    try {
 	        method.addParameter("reservaId", Long.toString(reservaId));
 	
@@ -315,11 +319,9 @@ public class RestClientOfertaService implements ClientOfertaService {
 	            throw new RuntimeException(ex);
 	        }
 	        try {
-	            validateResponse(statusCode, HttpStatus.SC_CREATED, method);
+	            validateResponse(statusCode, HttpStatus.SC_OK, method);
 	        } catch (InstanceNotFoundException ex) {
 	            throw ex;
-	
-	
 	        } catch (Exception ex) {
 	            throw new RuntimeException(ex);
 	        }
@@ -372,6 +374,13 @@ public class RestClientOfertaService implements ClientOfertaService {
                 try {
                     throw XmlExceptionConversor
                             .fromInputValidationExceptionXml(in);
+                } catch (ParsingException e) {
+                    throw new RuntimeException(e);
+                }
+            case HttpStatus.SC_FORBIDDEN:
+                try {
+                    throw XmlExceptionConversor
+                            .fromOfertaEstadoExceptionXml(in);
                 } catch (ParsingException e) {
                     throw new RuntimeException(e);
                 }

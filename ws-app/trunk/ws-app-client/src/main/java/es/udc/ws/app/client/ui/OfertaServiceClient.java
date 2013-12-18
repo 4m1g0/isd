@@ -232,7 +232,7 @@ public class OfertaServiceClient {
 
             try {
                 if (!clientOfertaService.reclamarOferta(Long.parseLong(args[1])))
-                	System.out.println("\nClaimed failed..");
+                	System.out.println("\nClaimed failed..\n<La reserva ya ha sido usada>");
                 else
                 	System.out.println("\nClaimed sucessfully!");
 

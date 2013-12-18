@@ -27,61 +27,17 @@ public class XmlOfertaDtoConversor {
         return new Document(ofertaElement);
     }
 
-    public static Document toXml(List<OfertaDto> oferta)
+    public static Document toXml(List<OfertaDto> ofertas)
             throws IOException {
 
         Element ofertasElement = new Element("ofertas", XML_NS);
-        for (int i = 0; i < oferta.size(); i++) {
-            OfertaDto xmlOfertaDto = oferta.get(i);
+        for (int i = 0; i < ofertas.size(); i++) {
+            OfertaDto xmlOfertaDto = ofertas.get(i);
             Element ofertaElement = toJDOMElement(xmlOfertaDto);
             ofertasElement.addContent(ofertaElement);
         }
 
         return new Document(ofertasElement);
-    }
-
-    public static OfertaDto toOferta(InputStream ofertaXml)
-            throws ParsingException {
-        try {
-
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(ofertaXml);
-            Element rootElement = document.getRootElement();
-
-            return toOferta(rootElement);
-        } catch (ParsingException ex) {
-            throw ex;
-        } catch (Exception e) {
-            throw new ParsingException(e);
-        }
-    }
-
-    public static List<OfertaDto> toOfertas(InputStream ofertaXml)
-            throws ParsingException {
-        try {
-
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(ofertaXml);
-            Element rootElement = document.getRootElement();
-
-            if(!"ofertas".equalsIgnoreCase(rootElement.getName())) {
-                throw new ParsingException("Unrecognized element '"
-                    + rootElement.getName() + "' ('ofertas' expected)");
-            }
-            @SuppressWarnings("unchecked")
-			List<Element> children = rootElement.getChildren();
-            List<OfertaDto> ofertaDtos = new ArrayList<>(children.size());
-            for (int i = 0; i < children.size(); i++) {
-                Element element = children.get(i);
-                ofertaDtos.add(toOferta(element));
-            }
-
-            return ofertaDtos;
-        } catch (ParsingException ex) {
-            throw ex;
-        } catch (Exception e) {
-            throw new ParsingException(e);
-        }
     }
 
     public static Element toJDOMElement(OfertaDto oferta) {
@@ -134,6 +90,50 @@ public class XmlOfertaDtoConversor {
 
 
         return ofertaElement;
+    }
+    
+    public static OfertaDto toOferta(InputStream ofertaXml)
+            throws ParsingException {
+        try {
+
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(ofertaXml);
+            Element rootElement = document.getRootElement();
+
+            return toOferta(rootElement);
+        } catch (ParsingException ex) {
+            throw ex;
+        } catch (Exception e) {
+            throw new ParsingException(e);
+        }
+    }
+
+    public static List<OfertaDto> toOfertas(InputStream ofertaXml)
+            throws ParsingException {
+        try {
+
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(ofertaXml);
+            Element rootElement = document.getRootElement();
+
+            if(!"ofertas".equalsIgnoreCase(rootElement.getName())) {
+                throw new ParsingException("Unrecognized element '"
+                    + rootElement.getName() + "' ('ofertas' expected)");
+            }
+            @SuppressWarnings("unchecked")
+			List<Element> children = rootElement.getChildren();
+            List<OfertaDto> ofertaDtos = new ArrayList<>(children.size());
+            for (int i = 0; i < children.size(); i++) {
+                Element element = children.get(i);
+                ofertaDtos.add(toOferta(element));
+            }
+
+            return ofertaDtos;
+        } catch (ParsingException ex) {
+            throw ex;
+        } catch (Exception e) {
+            throw new ParsingException(e);
+        }
     }
 
     private static Calendar getFecha(Element fechaElement)
@@ -206,9 +206,6 @@ public class XmlOfertaDtoConversor {
         
         Long maxPersonas = Long.valueOf(
                 ofertaElement.getChildTextTrim("maxPersonas", XML_NS));
-
-        /*short estado = Short.valueOf(
-                ofertaElement.getChildTextTrim("estado", XML_NS));*/
 
         return new OfertaDto(identifier, titulo, descripcion, iniReserva, limReserva, limOferta, 
         		precioReal, precioRebajado, maxPersonas);

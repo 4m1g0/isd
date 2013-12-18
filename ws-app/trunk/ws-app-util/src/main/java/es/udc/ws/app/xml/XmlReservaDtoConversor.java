@@ -1,9 +1,5 @@
 package es.udc.ws.app.xml;
 
-import es.udc.ws.app.dto.OfertaDto;
-import es.udc.ws.app.dto.ReservaDto;
-import es.udc.ws.app.dto.ReservaDto.Estado;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -16,37 +12,36 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 
+import es.udc.ws.app.dto.ReservaDto;
+import es.udc.ws.app.dto.ReservaDto.Estado;
+
 public class XmlReservaDtoConversor {
 
     public final static Namespace XML_NS = Namespace
             .getNamespace("http://ws.udc.es/reservas/xml");
 
-    public static Document toResponse(ReservaDto reserva)
+    public static Document toXml(ReservaDto reserva)
             throws IOException {
 
-        Element reservaElement = toXml(reserva);
+        Element reservaElement = toJDOMElement(reserva);
 
         return new Document(reservaElement);
     }
 
-    public static ReservaDto toReserva(InputStream reservaXml)
-            throws ParsingException {
-        try {
+	public static Document toXml(List<ReservaDto> reservas)
+        throws IOException {
 
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(reservaXml);
-            Element rootElement = document.getRootElement();
-
-            return toReserva(rootElement);
-        } catch (ParsingException ex) {
-            throw ex;
-        } catch (Exception e) {
-            throw new ParsingException(e);
+        Element reservasElement = new Element("reservas", XML_NS);
+        for (int i = 0; i < reservas.size(); i++) {
+            ReservaDto xmlReservaDto = reservas.get(i);
+            Element reservaElement = toJDOMElement(xmlReservaDto);
+            reservasElement.addContent(reservaElement);
         }
-    }
 
-    public static Element toXml(ReservaDto reserva) {
-
+        return new Document(reservasElement);
+	}
+    
+    public static Element toJDOMElement(ReservaDto reserva) {
         Element reservaElement = new Element("reserva", XML_NS);
 
         if (reserva.getReservaId() != null) {
@@ -67,13 +62,28 @@ public class XmlReservaDtoConversor {
         
         if (reserva.getFechaReserva() != null) {
             Element fechaReservaElement = getFecha(reserva
-                    .getFechaReserva());
+                    .getFechaReserva(), "fechaReserva");
             reservaElement.addContent(fechaReservaElement);
         }
 
         return reservaElement;
     }
+    public static ReservaDto toReserva(InputStream reservaXml)
+            throws ParsingException {
+        try {
 
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(reservaXml);
+            Element rootElement = document.getRootElement();
+
+            return toReserva(rootElement);
+        } catch (ParsingException ex) {
+            throw ex;
+        } catch (Exception e) {
+            throw new ParsingException(e);
+        }
+    }
+    
     private static ReservaDto toReserva(Element reservaElement)
             throws ParsingException, DataConversionException,
             NumberFormatException {
@@ -148,9 +158,9 @@ public class XmlReservaDtoConversor {
 
     }
 
-    private static Element getFecha(Calendar fecha) {
+    private static Element getFecha(Calendar fecha, String name) {
 
-        Element releaseDateElement = new Element("fecha", XML_NS);
+        Element releaseDateElement = new Element(name, XML_NS);
         int day = fecha.get(Calendar.DAY_OF_MONTH);
         int month = fecha.get(Calendar.MONTH) - Calendar.JANUARY + 1;
         int year = fecha.get(Calendar.YEAR);
