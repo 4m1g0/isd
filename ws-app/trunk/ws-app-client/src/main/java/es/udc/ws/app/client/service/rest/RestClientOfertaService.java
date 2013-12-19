@@ -76,7 +76,7 @@ public class RestClientOfertaService implements ClientOfertaService {
                 throw new RuntimeException(ex);
             }
             try {
-                validateResponse(statusCode, HttpStatus.SC_CREATED, method);
+                validateResponse(statusCode, 0, HttpStatus.SC_CREATED, method);
             } catch (InputValidationException ex) {
                 throw ex;
             } catch (Exception ex) {
@@ -122,7 +122,7 @@ public class RestClientOfertaService implements ClientOfertaService {
                 throw new RuntimeException(ex);
             }
             try {
-                validateResponse(statusCode, HttpStatus.SC_NO_CONTENT, method);
+                validateResponse(statusCode, 0, HttpStatus.SC_NO_CONTENT, method);
             } catch (InputValidationException | InstanceNotFoundException ex) {
                 throw ex;
             } catch (Exception ex) {
@@ -140,7 +140,7 @@ public class RestClientOfertaService implements ClientOfertaService {
         try {
             HttpClient client = new HttpClient();
             int statusCode = client.executeMethod(method);
-            validateResponse(statusCode, HttpStatus.SC_NO_CONTENT, method);
+            validateResponse(statusCode, 0, HttpStatus.SC_NO_CONTENT, method);
         } catch (InstanceNotFoundException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -168,7 +168,7 @@ public class RestClientOfertaService implements ClientOfertaService {
                 throw new RuntimeException(ex);
             }
             try {
-                validateResponse(statusCode, HttpStatus.SC_OK, method);
+                validateResponse(statusCode, 0, HttpStatus.SC_OK, method);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -196,7 +196,7 @@ public class RestClientOfertaService implements ClientOfertaService {
 	            throw new RuntimeException(ex);
 	        }
 	        try {
-	            validateResponse(statusCode, HttpStatus.SC_OK, method);
+	            validateResponse(statusCode, 0, HttpStatus.SC_OK, method);
 	        } catch (Exception ex) {
 	            throw new RuntimeException(ex);
 	        }
@@ -229,7 +229,7 @@ public class RestClientOfertaService implements ClientOfertaService {
                 throw new RuntimeException(ex);
             }
             try {
-                validateResponse(statusCode, HttpStatus.SC_CREATED, method);
+                validateResponse(statusCode, 0, HttpStatus.SC_CREATED, method);
             } catch (InputValidationException | InstanceNotFoundException ex) {
                 throw ex;
             } catch (Exception ex) {
@@ -259,7 +259,7 @@ public class RestClientOfertaService implements ClientOfertaService {
 	            throw new RuntimeException(ex);
 	        }
 	        try {
-	            validateResponse(statusCode, HttpStatus.SC_OK, method);
+	            validateResponse(statusCode, 0, HttpStatus.SC_OK, method);
 	        } catch (Exception ex) {
 	            throw new RuntimeException(ex);
 	        }
@@ -288,7 +288,7 @@ public class RestClientOfertaService implements ClientOfertaService {
 	            throw new RuntimeException(ex);
 	        }
 	        try {
-	            validateResponse(statusCode, HttpStatus.SC_OK, method);
+	            validateResponse(statusCode, 0, HttpStatus.SC_OK, method);
 	        } catch (Exception ex) {
 	            throw new RuntimeException(ex);
 	        }
@@ -319,7 +319,7 @@ public class RestClientOfertaService implements ClientOfertaService {
 	            throw new RuntimeException(ex);
 	        }
 	        try {
-	            validateResponse(statusCode, HttpStatus.SC_OK, method);
+	            validateResponse(statusCode, 1, HttpStatus.SC_OK, method);
 	        } catch (InstanceNotFoundException ex) {
 	            throw ex;
 	        } catch (Exception ex) {
@@ -342,7 +342,7 @@ public class RestClientOfertaService implements ClientOfertaService {
         return endpointAddress;
     }
 
-    private void validateResponse(int statusCode,
+    private void validateResponse(int statusCode, int auxCode,
                                   int expectedStatusCode,
                                   HttpMethod method)
             throws InstanceNotFoundException, InputValidationException, OfertaEstadoException, 
@@ -377,7 +377,21 @@ public class RestClientOfertaService implements ClientOfertaService {
                 } catch (ParsingException e) {
                     throw new RuntimeException(e);
                 }
+            case HttpStatus.SC_UNAUTHORIZED:
+                try {
+                    throw XmlExceptionConversor
+                            .fromOfertaEmailExceptionXml(in);
+                } catch (ParsingException e) {
+                    throw new RuntimeException(e);
+                }
             case HttpStatus.SC_FORBIDDEN:
+                try {
+                    throw XmlExceptionConversor
+                            .fromOfertaMaxPersonasExceptionXml(in);
+                } catch (ParsingException e) {
+                    throw new RuntimeException(e);
+                }
+            case HttpStatus.SC_CONFLICT:
                 try {
                     throw XmlExceptionConversor
                             .fromOfertaEstadoExceptionXml(in);
@@ -385,12 +399,22 @@ public class RestClientOfertaService implements ClientOfertaService {
                     throw new RuntimeException(e);
                 }
             case HttpStatus.SC_GONE:
-                try {
-                    throw XmlExceptionConversor
-                            .fromOfertaReservaDateExceptionXml(in);
-                } catch (ParsingException e) {
-                    throw new RuntimeException(e);
-                }
+            	if (auxCode == 0) { //ReservaDateException
+	                try {
+	                    throw XmlExceptionConversor
+	                            .fromOfertaReservaDateExceptionXml(in);
+	                } catch (ParsingException e) {
+	                    throw new RuntimeException(e);
+	                }
+            	}
+            	if (auxCode == 1) { //ReclamaDateException
+	                try {
+	                    throw XmlExceptionConversor
+	                            .fromOfertaReclamaDateExceptionXml(in);
+	                } catch (ParsingException e) {
+	                    throw new RuntimeException(e);
+	                }
+            	}
             default:
                 if (statusCode != expectedStatusCode) {
                     throw new RuntimeException("HTTP error; status code = "

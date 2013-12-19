@@ -1,6 +1,6 @@
 package es.udc.ws.app.test.model.ofertaservice;
 
-import static es.udc.ws.app.model.util.ModelConstants.OFERTA_DATA_SOURCE;
+import static es.udc.ws.app.model.util.DataSourceConstant.OFERTA_DATA_SOURCE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

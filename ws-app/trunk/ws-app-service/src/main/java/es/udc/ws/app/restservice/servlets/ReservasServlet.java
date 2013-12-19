@@ -92,13 +92,13 @@ public class ReservasServlet extends HttpServlet {
 	                    new InputValidationException(ex.getMessage())), null);
 	            return;
 	        } catch (OfertaMaxPersonasException e) {
-	            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_BAD_REQUEST, 
+	            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_FORBIDDEN, 
 	                    XmlExceptionConversor.toOfertaMaxPersonasException(
 	                    new OfertaMaxPersonasException(ofertaId, oferta.getMaxPersonas())),
 	                    null);
 	            return;
 			} catch (OfertaEmailException e) {
-	            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_BAD_REQUEST,
+	            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_UNAUTHORIZED,
 	                    XmlExceptionConversor.toOfertaEmailException(
 	                    new OfertaEmailException(ofertaId, emailUsuario)), null);
 	            return;
@@ -239,7 +239,6 @@ public class ReservasServlet extends HttpServlet {
 	                XmlReservaDtoConversor.toXml(reservaDtos), null);
         }
 	        	
-        
         // FindReserva(reservaId)
         else {
 	        String reservaIdAsString = path.endsWith("/") && path.length() > 2 ?

@@ -1,6 +1,6 @@
 package es.udc.ws.app.model.ofertaservice;
 
-import static es.udc.ws.app.model.util.ModelConstants.OFERTA_DATA_SOURCE;
+import static es.udc.ws.app.model.util.DataSourceConstant.OFERTA_DATA_SOURCE;
 
 import java.sql.Connection;
 import java.sql.SQLException;
