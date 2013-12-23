@@ -15,6 +15,7 @@ import es.udc.ws.app.exceptions.OfertaEmailException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.exceptions.ReservaEstadoException;
 import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.app.model.ofertaservice.OfertaServiceFactory;
 import es.udc.ws.app.model.reserva.Reserva;
@@ -145,7 +146,13 @@ public class ReservasServlet extends HttpServlet {
 	                    new InstanceNotFoundException(ex.getInstanceId()
 	                        .toString(),ex.getInstanceType())), null);
 	            return;
-			} catch (OfertaReclamaDateException e) {
+			}
+	        catch (ReservaEstadoException e) {
+	            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_FORBIDDEN, 
+	                    XmlExceptionConversor.toReservaEstadoException(
+	                    new ReservaEstadoException(reservaId, e.getEstado())), null);
+	            return;	
+	        } catch (OfertaReclamaDateException e) {
 	            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_GONE, 
 	                    XmlExceptionConversor.toOfertaReclamaDateException(
 	                    new OfertaReclamaDateException(reserva.getOfertaId())), null);

@@ -145,6 +145,7 @@ public class XmlReservaDtoConversor {
         if (fechaElement == null) {
             return null;
         }
+        int second = fechaElement.getAttribute("second").getIntValue();
         int minute = fechaElement.getAttribute("minute").getIntValue();
         int hour = fechaElement.getAttribute("hour").getIntValue();
         int day = fechaElement.getAttribute("day").getIntValue();
@@ -152,10 +153,11 @@ public class XmlReservaDtoConversor {
         int year = fechaElement.getAttribute("year").getIntValue();
         Calendar releaseDate = Calendar.getInstance();
 
+        releaseDate.set(Calendar.SECOND, second);
         releaseDate.set(Calendar.MINUTE, minute);
-        releaseDate.set(Calendar.HOUR, hour);
+        releaseDate.set(Calendar.HOUR_OF_DAY, hour);
         releaseDate.set(Calendar.DAY_OF_MONTH, day);
-        releaseDate.set(Calendar.MONTH, Calendar.JANUARY + month - 1);
+        releaseDate.set(Calendar.MONTH, month);
         releaseDate.set(Calendar.YEAR, year);
 
         return releaseDate;
@@ -166,12 +168,14 @@ public class XmlReservaDtoConversor {
 
         Element releaseDateElement = new Element(name, XML_NS);
 
+        int second = fecha.get(Calendar.SECOND);
         int minute = fecha.get(Calendar.MINUTE);
-        int hour = fecha.get(Calendar.HOUR);
+        int hour = fecha.get(Calendar.HOUR_OF_DAY);
         int day = fecha.get(Calendar.DAY_OF_MONTH);
         int month = fecha.get(Calendar.MONTH);
         int year = fecha.get(Calendar.YEAR);
 
+        releaseDateElement.setAttribute("second", Integer.toString(second));
         releaseDateElement.setAttribute("minute", Integer.toString(minute));
         releaseDateElement.setAttribute("hour", Integer.toString(hour));
         releaseDateElement.setAttribute("day", Integer.toString(day));

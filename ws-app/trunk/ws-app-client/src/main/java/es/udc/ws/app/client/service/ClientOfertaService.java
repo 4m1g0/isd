@@ -10,6 +10,7 @@ import es.udc.ws.app.exceptions.OfertaEstadoException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.exceptions.ReservaEstadoException;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
@@ -36,8 +37,7 @@ public interface ClientOfertaService {
 
     public ReservaDto findReserva(Long reservaId) throws InstanceNotFoundException;
 
-    //reclamarOferta: Si devuelve false ==> la reserva está cerrada. Si devuelve true ==> la reserva está abierta.
-    public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException;
+    public void reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException, ReservaEstadoException;
     
 
 }

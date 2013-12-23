@@ -66,7 +66,6 @@ public class OfertasServlet extends HttpServlet{
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
-        
         String requestURI = req.getRequestURI();
         int idx = requestURI.lastIndexOf('/');
         if (idx <= 0) {
@@ -120,9 +119,9 @@ public class OfertasServlet extends HttpServlet{
                     null);       
             return;
         } catch (OfertaEstadoException e) {
-            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_CONFLICT, 
+            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_FORBIDDEN, 
                     XmlExceptionConversor.toOfertaEstadoException(
-                    new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado().name())),
+                    new OfertaEstadoException(oferta.getOfertaId(), e.getEstado())),
                     null);
             return;
 		}
@@ -173,7 +172,7 @@ public class OfertasServlet extends HttpServlet{
                     null);
             return;
 		} catch (OfertaEstadoException e) {
-            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_CONFLICT, 
+            ServletUtils.writeServiceResponse(resp, HttpServletResponse.SC_FORBIDDEN, 
                     XmlExceptionConversor.toOfertaEstadoException(
                     new OfertaEstadoException(oferta.getOfertaId(), oferta.getEstado().name())),
                     null);

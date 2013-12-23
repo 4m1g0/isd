@@ -14,6 +14,7 @@ import es.udc.ws.app.exceptions.OfertaEstadoException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.exceptions.ReservaEstadoException;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
@@ -85,6 +86,27 @@ public class XmlExceptionConversor {
 		    throw new ParsingException(e);
 		}
 	}
+    
+    public static ReservaEstadoException fromReservaEstadoExceptionXml(InputStream ex)
+    	    throws ParsingException {
+    			try {
+    			
+    			    SAXBuilder builder = new SAXBuilder();
+    			    Document document = builder.build(ex);
+    			    Element rootElement = document.getRootElement();
+    			
+    			    Element instanceId = rootElement.getChild("reservaId", XML_NS);
+    			    Element estadoElement = rootElement.getChild("estado", XML_NS);
+    			    
+    			    return new ReservaEstadoException(
+    			            Long.parseLong(instanceId.getTextTrim()),
+    			            (estadoElement.getText()));
+    			} catch (JDOMException | IOException | NumberFormatException e) {
+    			    throw new ParsingException(e);
+    		} catch (Exception e) {
+    		    throw new ParsingException(e);
+    		}
+    	}
     
     public static OfertaEmailException fromOfertaEmailExceptionXml(InputStream ex)
     	    throws ParsingException {
@@ -241,14 +263,11 @@ public class XmlExceptionConversor {
 		        exceptionElement.addContent(ofertaIdElement);
 		    }
 		
-		    //if(ex.getMaxPersonas() != null) {
-		
 		        Element maxPersonasElement = new
 		                Element("maxPersonas", XML_NS);
 		        maxPersonasElement.setText(Long.toString(ex.getMaxPersonas()));
 		
 		        exceptionElement.addContent(maxPersonasElement);
-		    //}
 		
 		    return new Document(exceptionElement);
 	}
@@ -266,14 +285,11 @@ public class XmlExceptionConversor {
 		        exceptionElement.addContent(ofertaIdElement);
 		    }
 		
-		    //if(ex.getEstado() != null) {
-		
 		        Element estadoElement = new
 		                Element("estado", XML_NS);
 		        estadoElement.setText(ex.getEstado());
 		
 		        exceptionElement.addContent(estadoElement);
-		    //}
 		
 		    return new Document(exceptionElement);
 	}
@@ -308,6 +324,26 @@ public class XmlExceptionConversor {
 		    }
 		
 		    return new Document(exceptionElement);
+	}
+
+	public static Document toReservaEstadoException(
+			ReservaEstadoException ex) {
+		    Element exceptionElement =
+		            new Element("ReservaEstadoException", XML_NS);
+	
+		    if(ex.getReservaId() != null) {
+		        Element reservaIdElement = new Element("reservaId", XML_NS);
+		        reservaIdElement.setText(ex.getReservaId().toString());
+		        exceptionElement.addContent(reservaIdElement);
+		    }
+	
+	        Element estadoElement = new
+	                Element("estado", XML_NS);
+	        estadoElement.setText(ex.getEstado());
+	
+	        exceptionElement.addContent(estadoElement);
+	
+	    return new Document(exceptionElement);
 	}
 	
 }

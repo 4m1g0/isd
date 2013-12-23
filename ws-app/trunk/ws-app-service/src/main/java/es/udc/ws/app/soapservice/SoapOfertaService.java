@@ -8,6 +8,7 @@ import es.udc.ws.app.exceptions.OfertaEstadoException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.exceptions.ReservaEstadoException;
 import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.app.model.ofertaservice.OfertaServiceFactory;
 import es.udc.ws.app.model.reserva.Reserva;
@@ -190,16 +191,19 @@ public class SoapOfertaService {
     @WebMethod(
             operationName="reclamarOferta"
         )
-        public boolean reclamarOferta(@WebParam(name="reservaId")  Long reservaId)
-                throws SoapInstanceNotFoundException, SoapInputValidationException, SoapOfertaReclamaDateException {
+        public void reclamarOferta(@WebParam(name="reservaId")  Long reservaId)
+                throws SoapInstanceNotFoundException, SoapInputValidationException, SoapOfertaReclamaDateException, SoapReservaEstadoException {
             try {
-            	
-                return OfertaServiceFactory.getService().reclamarOferta(reservaId);
+                OfertaServiceFactory.getService().reclamarOferta(reservaId);
                 
             } catch (InstanceNotFoundException ex) {
                 throw new SoapInstanceNotFoundException(
                         new SoapInstanceNotFoundExceptionInfo(ex.getInstanceId(),
                             ex.getInstanceType()));
+            }
+            catch (ReservaEstadoException ex) {
+                throw new SoapReservaEstadoException(
+                        new SoapReservaEstadoExceptionInfo(reservaId, ex.getEstado()));
             }
             catch (OfertaReclamaDateException ex) {
                 throw new SoapOfertaReclamaDateException(

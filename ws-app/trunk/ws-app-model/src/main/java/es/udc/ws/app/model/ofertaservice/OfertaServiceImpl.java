@@ -14,6 +14,7 @@ import es.udc.ws.app.exceptions.OfertaEstadoException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.exceptions.ReservaEstadoException;
 import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.app.model.oferta.Oferta.Estado;
 import es.udc.ws.app.model.oferta.SqlOfertaDao;
@@ -321,7 +322,7 @@ public class OfertaServiceImpl implements OfertaService {
     }
 
 	@Override
-	public boolean reclamarOferta(Long reservaId) throws InstanceNotFoundException, OfertaReclamaDateException {
+	public void reclamarOferta(Long reservaId) throws InstanceNotFoundException, ReservaEstadoException, OfertaReclamaDateException {
 		
         try (Connection connection = dataSource.getConnection()) {
             try {
@@ -334,7 +335,7 @@ public class OfertaServiceImpl implements OfertaService {
         		Reserva reserva = findReserva(reservaId);
         		
         		if (reserva.getEstado() == Reserva.Estado.CERRADA)
-        			return false;
+                	throw new ReservaEstadoException(reservaId, reserva.getEstado().name());    		
         		
         		Oferta oferta = findOferta(reserva.getOfertaId());
         		Calendar now = Calendar.getInstance();
@@ -361,9 +362,7 @@ public class OfertaServiceImpl implements OfertaService {
         		
                 /* Commit. */
                 connection.commit();
-        		
-        		return true;
-        		
+        		        		
             } catch (InstanceNotFoundException e) {
                 connection.commit();
                 throw e;

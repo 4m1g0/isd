@@ -15,6 +15,7 @@ import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaEstadoException;
 import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaMaxPersonasException;
 import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaReclamaDateException;
 import es.udc.ws.app.client.service.soap.wsdl.SoapOfertaReservaDateException;
+import es.udc.ws.app.client.service.soap.wsdl.SoapReservaEstadoException;
 import es.udc.ws.app.dto.OfertaDto;
 import es.udc.ws.app.dto.ReservaDto;
 import es.udc.ws.app.exceptions.OfertaEmailException;
@@ -22,6 +23,7 @@ import es.udc.ws.app.exceptions.OfertaEstadoException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.exceptions.ReservaEstadoException;
 import es.udc.ws.util.configuration.ConfigurationParametersManager;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
@@ -185,14 +187,17 @@ public class SoapClientOfertaService implements ClientOfertaService {
 	}
 
 	@Override
-	public boolean reclamarOferta(Long reservaId)
-			throws InstanceNotFoundException, OfertaReclamaDateException {
+	public void reclamarOferta(Long reservaId)
+			throws InstanceNotFoundException, ReservaEstadoException, OfertaReclamaDateException {
         try {
-            return ofertasProvider.reclamarOferta(reservaId);
+            ofertasProvider.reclamarOferta(reservaId);
         } catch (SoapInstanceNotFoundException ex) {
             throw new InstanceNotFoundException(
                     ex.getFaultInfo().getInstanceId(),
                     ex.getFaultInfo().getInstanceType());
+        }
+        catch (SoapReservaEstadoException ex) {
+            throw new ReservaEstadoException(reservaId, ex.getFaultInfo().getEstado());
         }
         catch (SoapOfertaReclamaDateException ex) {
             throw new OfertaReclamaDateException(ex.getFaultInfo().getOfertaId());

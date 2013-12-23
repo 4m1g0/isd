@@ -2,7 +2,6 @@ package es.udc.ws.app.test.model.ofertaservice;
 
 import static es.udc.ws.app.model.util.DataSourceConstant.OFERTA_DATA_SOURCE;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Connection;
@@ -22,6 +21,7 @@ import es.udc.ws.app.exceptions.OfertaEstadoException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.exceptions.ReservaEstadoException;
 import es.udc.ws.app.model.oferta.Oferta;
 import es.udc.ws.app.model.ofertaservice.OfertaService;
 import es.udc.ws.app.model.ofertaservice.OfertaServiceFactory;
@@ -451,27 +451,10 @@ public class OfertaServiceTest {
 		}
 
 	}
-
-	@Test
-	public void testReservar_y_Reclamar() throws InstanceNotFoundException,
-		InputValidationException, OfertaEstadoException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaReclamaDateException {
-			Oferta oferta = createOferta(getValidOferta());
-			try {
-				Reserva reserva = ofertaService.findReserva(ofertaService.reservarOferta(
-						oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER));
-				
-				assertTrue(ofertaService.reclamarOferta(reserva.getReservaId()));
-				assertFalse(ofertaService.reclamarOferta(reserva.getReservaId()));
-				/* Clear database. */
-				removeReserva(reserva.getReservaId());
-			} finally {
-				removeOferta(oferta.getOfertaId());
-			}
-	}
 	
 	@Test
 	public void testReservarOfertaAndFindReserva() throws InstanceNotFoundException,
-			InputValidationException, OfertaEstadoException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaReclamaDateException {
+			InputValidationException, OfertaEstadoException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaReclamaDateException, ReservaEstadoException {
 
 		Oferta oferta = createOferta(getValidOferta());
 		
@@ -505,7 +488,7 @@ public class OfertaServiceTest {
 
 	@Test
 	public void testReservarOfertasAndFindReservas() throws InstanceNotFoundException,
-			InputValidationException, OfertaEstadoException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaReclamaDateException {
+			InputValidationException, OfertaEstadoException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaReclamaDateException, ReservaEstadoException {
 		Oferta oferta = createOferta(getValidOferta());
 		List<Reserva> reservas = new ArrayList<Reserva>();
 		List<Reserva> _reservas = new ArrayList<Reserva>();
@@ -532,7 +515,11 @@ public class OfertaServiceTest {
 			assertEquals(1, _reservas.size());
 
 			for (Reserva reserva : ofertaService.findReservas(oferta.getOfertaId(), null)) {
-				ofertaService.reclamarOferta(reserva.getReservaId());
+				try {
+					ofertaService.reclamarOferta(reserva.getReservaId());
+				}
+				catch (ReservaEstadoException ex) {
+				}
 				removeReserva(reserva.getReservaId());
 			}
 		} 
@@ -681,7 +668,7 @@ public class OfertaServiceTest {
 	}
 	
 	//@Test(expected = OfertaMaxPersonasException.class)
-	public void testMaxPersonasException() throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
+	public void testMaxPersonasException() throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException, ReservaEstadoException {
 		Oferta oferta = createOferta(getValidOferta());
 		try {
 			ofertaService.reservarOferta(oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
@@ -701,7 +688,7 @@ public class OfertaServiceTest {
 	}
 	
 	@Test(expected = OfertaEstadoException.class)
-	public void testEstadoException() throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
+	public void testEstadoException() throws InstanceNotFoundException, InputValidationException, OfertaMaxPersonasException, OfertaEmailException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException, ReservaEstadoException {
 		Oferta oferta = createOferta(getValidOferta());
 		Reserva reserva = null;
 		try {
@@ -720,7 +707,7 @@ public class OfertaServiceTest {
 	}
 	
 	@Test(expected = OfertaEmailException.class)
-	public void testEmailException() throws InstanceNotFoundException, InputValidationException, OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
+	public void testEmailException() throws InstanceNotFoundException, InputValidationException, OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException, ReservaEstadoException {
 		Oferta oferta = createOferta(getValidOferta());
 		try {
 			ofertaService.reservarOferta(oferta.getOfertaId(), USER_EMAIL, VALID_CREDIT_CARD_NUMBER);
@@ -778,7 +765,7 @@ public class OfertaServiceTest {
 	 // y tampoco antes de reservarse porque iniReserva <= limReserva <= limOferta
 	// En resumen para comprobarlo habria que esperar a que en la oferta caducara su limite para disfrutarla
 	//@Test(expected = OfertaReclamaDateException.class)
-	public void testReclamaDateException() throws InstanceNotFoundException, InputValidationException, OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException {
+	public void testReclamaDateException() throws InstanceNotFoundException, InputValidationException, OfertaEmailException, OfertaMaxPersonasException, OfertaReservaDateException, OfertaEstadoException, OfertaReclamaDateException, ReservaEstadoException {
 
 		Oferta oferta = createOferta(getValidOferta());
 		Reserva reserva = null;

@@ -16,6 +16,7 @@ import es.udc.ws.app.exceptions.OfertaEstadoException;
 import es.udc.ws.app.exceptions.OfertaMaxPersonasException;
 import es.udc.ws.app.exceptions.OfertaReclamaDateException;
 import es.udc.ws.app.exceptions.OfertaReservaDateException;
+import es.udc.ws.app.exceptions.ReservaEstadoException;
 import es.udc.ws.util.exceptions.InputValidationException;
 import es.udc.ws.util.exceptions.InstanceNotFoundException;
 
@@ -133,7 +134,14 @@ public class OfertaServiceClient {
         	
             try {
             	
-            	if (args[1] != null) {
+            	if (args.length == 1)
+	                ofertas = clientOfertaService.findOfertas("");
+            	
+            	else if (args[1].equals("null")) {
+	                ofertas = clientOfertaService.findOfertas("");
+            	}
+
+            	else if (args[1] != null) {
             		validateArgs(args, 2, new int[] {});
             		
 	                ofertas = clientOfertaService.findOfertas(args[1]);
@@ -141,10 +149,10 @@ public class OfertaServiceClient {
 	                        " oferta(s) with keywords '" + args[1] + "'");
             	}
             	
-            	else {
+            	/*else {
             		validateArgs(args, 1, new int[] {});
             		ofertas = clientOfertaService.findOfertas(null);
-            	}
+            	}*/
             	
                 for (int i = 0; i < ofertas.size(); i++) {
                     OfertaDto ofertaDto = ofertas.get(i);
@@ -231,12 +239,12 @@ public class OfertaServiceClient {
             // [reclamarOferta] OfertaServiceClient -ro <reservaId>
 
             try {
-                if (!clientOfertaService.reclamarOferta(Long.parseLong(args[1])))
-                	System.out.println("\nClaimed failed..\n<La reserva ya ha sido usada>");
-                else
+                clientOfertaService.reclamarOferta(Long.parseLong(args[1]));
                 	System.out.println("\nClaimed sucessfully!");
-
             } 
+            catch (ReservaEstadoException ex) {
+                ex.printStackTrace(System.err);
+            }
             catch (OfertaReclamaDateException ex) {
                 ex.printStackTrace(System.err);
             }
